@@ -220,9 +220,10 @@
 
     <div id="shuffledResultSection" style="display: none; margin-top: 30px;">
         <h2>5. KẾT QUẢ TRỘN ĐỀ</h2>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn btn-copy" onclick="copyLatex('outputShuffledLatex')">📋 Copy Mã LaTeX Đã Trộn</button>
-            <button class="btn btn-copy" onclick="downloadExcel()" style="background-color: #27ae60;">📊 Tải File Excel Đáp Án (.xlsx)</button>
+            <button class="btn btn-copy" onclick="downloadExcel()" style="background-color: #27ae60;">📊 Tải Excel (Chuẩn chung)</button>
+            <button class="btn btn-copy" onclick="downloadK12Excel()" style="background-color: #d35400;">📊 Tải Excel (K12Online)</button>
         </div>
         <textarea id="outputShuffledLatex" readonly placeholder="Mã LaTeX của tất cả các mã đề đã trộn sẽ hiện ở đây..."></textarea>
     </div>
@@ -727,6 +728,7 @@ NHIỆM VỤ CỦA BẠN:
 
     // --- KHỐI TÍNH NĂNG TRỘN ĐỀ VÀ XUẤT EXCEL (BƯỚC 2) ---
     let globalExcelData = [];
+    let globalK12ExcelData = [];
 
     function shuffleArray(array) {
         let newArray = [...array];
@@ -831,6 +833,13 @@ NHIỆM VỤ CỦA BẠN:
         for (let i = 0; i < questionLabels.length; i++) {
             transposedCsv.push([questionLabels[i]]);
         }
+        
+        // Khởi tạo mảng K12Online
+        let k12Csv = [];
+        k12Csv.push(["Phần", "Câu hỏi"]);
+        for(let i=1; i<=part1.length; i++) k12Csv.push(["I", i]);
+        for(let i=1; i<=part2.length; i++) k12Csv.push(["II", i]);
+        for(let i=1; i<=part3.length; i++) k12Csv.push(["III", i]);
 
         let resetLists = `\n% --- RESET BỘ NHỚ LỜI GIẢI CHO MỖI MÃ ĐỀ ---\n\\renewcommand{\\listdaI}{} \\renewcommand{\\listdaII}{} \\renewcommand{\\listdaIII}{}\n\\renewcommand{\\listsolI}{} \\renewcommand{\\listsolII}{} \\renewcommand{\\listsolIII}{} \\renewcommand{\\listsolIV}{}\n`;
         let fullShuffledLatex = preamble + "\\begin{document}\n";
@@ -842,6 +851,7 @@ NHIỆM VỤ CỦA BẠN:
         for (let e = 0; e < numExams; e++) {
             let code = startCode + e;
             if (transposedCsv.length > 0 && transposedCsv[0]) transposedCsv[0].push(code); 
+            if (k12Csv.length > 0 && k12Csv[0]) k12Csv[0].push(code);
             let qIndex = 1; 
             
             let currentHeader = examHeaderTemplate.replace(/Mã đề: \d+/g, `Mã đề: ${code}`);
@@ -858,6 +868,7 @@ NHIỆM VỤ CỦA BẠN:
                     let processed = parseExI(shuffled1[i].body, shuffled1[i].ans); 
                     examContent += `\\begin{exI}{${i+1}}{${processed.newAns}}${processed.newBody}\\end{exI}\n\n`;
                     if(transposedCsv[qIndex]) transposedCsv[qIndex].push(processed.newAns);
+                    if(k12Csv[qIndex]) k12Csv[qIndex].push(processed.newAns);
                     qIndex++;
                 }
                 if (hasMulticols) examContent += "\\end{multicols}\n";
@@ -873,6 +884,7 @@ NHIỆM VỤ CỦA BẠN:
                     
                     let cleanAns2 = shuffled2[i].ans.replace(/-/g, "");
                     if(transposedCsv[qIndex]) transposedCsv[qIndex].push(cleanAns2);
+                    if(k12Csv[qIndex]) k12Csv[qIndex].push(cleanAns2);
                     qIndex++;
                 }
                 if (hasMulticols) examContent += "\\end{multicols}\n";
@@ -888,6 +900,7 @@ NHIỆM VỤ CỦA BẠN:
                     examContent += `\\begin{exIII}{${i+1}}{${shuffled3[i].ans}}${shuffled3[i].body}\\end{exIII}\n\n`;
                     
                     if(transposedCsv[qIndex]) transposedCsv[qIndex].push(ansStr);
+                    if(k12Csv[qIndex]) k12Csv[qIndex].push(ansStr);
                     qIndex++;
                 }
                 if (hasMulticols) examContent += "\\end{multicols}\n";
@@ -942,6 +955,7 @@ NHIỆM VỤ CỦA BẠN:
         fullShuffledLatex += "\\end{document}";
         
         globalExcelData = transposedCsv;
+        globalK12ExcelData = k12Csv;
 
         document.querySelector('#shuffledResultSection h2').innerText = "5. KẾT QUẢ TRỘN ĐỀ";
         document.getElementById('outputShuffledLatex').value = fullShuffledLatex;
@@ -1023,6 +1037,7 @@ NHIỆM VỤ CỦA BẠN:
         
         // Cảnh báo không có xuất Excel khi chỉ chuyển đổi
         globalExcelData = [];
+        globalK12ExcelData = [];
     }
 
     function downloadExcel() {
@@ -1034,6 +1049,17 @@ NHIỆM VỤ CỦA BẠN:
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "DapAn");
         XLSX.writeFile(workbook, "MaTran_DapAn_TronDe.xlsx");
+    }
+
+    function downloadK12Excel() {
+        if (!globalK12ExcelData || globalK12ExcelData.length <= 1) {
+            alert("Đề thi này 100% tự luận hoặc chưa có dữ liệu trắc nghiệm. Không cần tải Excel!");
+            return;
+        }
+        const worksheet = XLSX.utils.aoa_to_sheet(globalK12ExcelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "K12Online");
+        XLSX.writeFile(workbook, "DapAn_K12Online.xlsx");
     }
 </script>
 
