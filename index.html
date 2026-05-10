@@ -124,6 +124,7 @@
                 <option value="1">1. Chuẩn tinh tế (1 Cột, Truyền thống, Dễ nhìn nhất)</option>
                 <option value="2">2. Tiết kiệm không gian (Chia 2 cột dọc, Giống đề thi thật)</option>
                 <option value="3">3. Khung viền hiện đại (Tcolorbox cao cấp, Sang trọng, Đóng khung từng câu)</option>
+                <option value="4" style="font-weight: bold; color: #e74c3c;">4. Mobile A5 (Giấy A5, Font to 12pt, Màu nổi bật 3D, Dễ nhìn trên Điện thoại)</option>
             </select>
         </div>
     </div>
@@ -224,7 +225,7 @@
 
 <!-- LÕI CẤU TRÚC LATEX -->
 <script id="latex-header" type="text/plain">
-\documentclass[11pt,a4paper]{article}
+\documentclass[{{DOC_OPTS}}]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T5]{fontenc}
 {{FONT_PACKAGE}}
@@ -239,7 +240,7 @@
 \usepackage{graphicx}
 \usepackage{environ} 
 {{LAYOUT_PACKAGE}}
-\usepackage[margin=1cm, top=1.2cm, bottom=1.2cm]{geometry}
+{{GEOMETRY_OPTS}}
 
 {{COLOR_PALETTE}}
 
@@ -487,25 +488,44 @@
 
 NHIỆM VỤ CỦA BẠN:
 1. BÁM SÁT CHI TIẾT MA TRẬN: Biên soạn chính xác số lượng, độ khó và ĐẶC BIỆT PHẢI TUÂN THỦ [YÊU CẦU DẠNG BÀI].
-2. KHÔNG THAY ĐỔI CẤU TRÚC LỆNH GỐC LaTeX. Dùng phẩy (,) cho số thập phân, chấm phẩy (;) cho tọa độ.
-3. QUY TẮC CHÈN HÌNH TIKZ CHỐNG LỖI GIÃN CHỮ (VÔ CÙNG QUAN TRỌNG): 
+2. KHÔNG THAY ĐỔI CẤU TRÚC LỆNH GỐC LaTeX. Dùng phẩy (,) cho số thập phân, chấm phẩy (;) cho tọa độ. BẮT BUỘC dùng ký hiệu vector dài \\overrightarrow{} cho tất cả các vector (VD: \\overrightarrow{AB}, \\overrightarrow{u}), TUYỆT ĐỐI KHÔNG dùng lệnh \\vec{}.`;
+
+        if (layoutOpt === "4") {
+            instructionForAI += `\n3. QUY TẮC CHÈN HÌNH TIKZ CHO KHỔ A5 MOBILE (VÔ CÙNG QUAN TRỌNG):
+   - ĐẶC BIỆT LƯU Ý: Đây là Bố cục khổ giấy A5. Không gian bề ngang rất hẹp. 
+   - Hình vẽ TikZ BẮT BUỘC đặt ở môi trường \\begin{center}...\\end{center} thành 1 dòng riêng biệt (nằm giữa đề bài và đáp án). 
+   - TUYỆT ĐỐI KHÔNG dùng wrapfigure hay khối makebox.\\hangindent.
+   - Chỉnh sửa \\scale=... (VD: scale=0.45) để hình thật nhỏ gọn trên màn hình điện thoại.`;
+        } else {
+            instructionForAI += `\n3. QUY TẮC CHÈN HÌNH TIKZ CHỐNG LỖI GIÃN CHỮ (VÔ CÙNG QUAN TRỌNG): 
    - Tuyệt đối KHÔNG DÙNG wrapfigure hay minipage. Tôi đã trang bị cho bạn thủ thuật \\hangafter và \\makebox. Kỹ thuật này giúp chữ tự động lượn vòng qua hình vẽ cực kỳ đẹp mắt mà KHÔNG BAO GIỜ bị giãn chữ.
    - BẮT BUỘC thiết lập tỷ lệ VĂN BẢN CHIẾM 3/5 VÀ HÌNH VẼ CHIẾM 2/5 bằng cách dùng thông số \\linewidth tương đối:
      + \\hangafter=-N (N là số dòng cần chừa trống bên phải, ví dụ -6)
      + \\hangindent=-0.4\\linewidth (Chừa đúng 2/5 không gian lề phải cho hình)
      + \\hspace{0.6\\linewidth} (Đẩy hình sang lề phải 3/5 khoảng trống)
      + \\raisebox{-Zcm}[0pt][0pt] (Z là độ dịch chuyển kéo hình xuống dưới cho cân đối với dòng chữ đầu tiên)
-   - Đề bài phải được viết nối tiếp NGAY DƯỚI dấu } cuối cùng của khối \\makebox.
-4. ĐÁP ÁN TRẮC NGHIỆM: Không dùng \\choice nếu có hình vẽ (tránh bị hình đè). BẮT BUỘC dùng \\choiceTwo hoặc \\choiceOne. 
-   - MẸO: Nếu thấy đáp án bị hình đè, hãy chủ động chèn thêm lệnh \\vspace{...} vào cuối đề bài để đẩy đáp án xuống dưới vùng an toàn của hình.
-5. CÂU TỰ LUẬN (\\begin{exTL}): Tự phân bổ số điểm. Trong phần \\loigiai, trình bày chi tiết và BẮT BUỘC chèn lệnh \\diem{0.25}, \\diem{0.5}... ở cuối mỗi dòng chấm điểm. Lệnh \\diem{} sẽ tự dạt sang phải.`;
+   - Đề bài phải được viết nối tiếp NGAY DƯỚI dấu } cuối cùng của khối \\makebox.`;
+        }
+
+        instructionForAI += `\n4. ĐÁP ÁN TRẮC NGHIỆM: Không dùng \\choice nếu có hình vẽ (tránh bị hình đè). BẮT BUỘC dùng \\choiceTwo hoặc \\choiceOne.`;
+   
+        if (layoutOpt === "4") {
+            instructionForAI += `\n   - HÃY ƯU TIÊN dùng \\choiceOne hoặc \\choiceTwo cho TẤT CẢ các câu trắc nghiệm vì giấy A5 rất hẹp.`;
+        } else {
+            instructionForAI += `\n   - MẸO: Nếu thấy đáp án bị hình đè, hãy chủ động chèn thêm lệnh \\vspace{...} vào cuối đề bài để đẩy đáp án xuống dưới vùng an toàn của hình.`;
+        }
+
+        instructionForAI += `\n5. CÂU TỰ LUẬN (\\begin{exTL}): Tự phân bổ số điểm. Trong phần \\loigiai, trình bày chi tiết và BẮT BUỘC chèn lệnh \\diem{0.25}, \\diem{0.5}... ở cuối mỗi dòng chấm điểm. Lệnh \\diem{} sẽ tự dạt sang phải.`;
 
         if (extraNotes) instructionForAI += `\n\n6. GHI CHÚ BỔ SUNG TỪ GIÁO VIÊN (RẤT QUAN TRỌNG):\n${extraNotes}\n`;
         instructionForAI += `\n\nMÃ KHUNG LATEX BẠN CẦN LÀM VIỆC:\n\`\`\`latex\n`;
 
         let aiPromptBlock = `% ===================================================================\n% [THÔNG TIN KỲ THI]: ${kythi}\n% [MÔN - LỚP]: ${monlop}\n% [THỜI GIAN]: ${thoigian} phút\n% [TỔNG SỐ CÂU PHẦN I]: ${count1} câu\n% [TỔNG SỐ CÂU PHẦN II]: ${count2} câu\n% [TỔNG SỐ CÂU PHẦN III]: ${count3} câu\n% [TỔNG SỐ CÂU TỰ LUẬN]: ${count4} câu\n%\n% [MA TRẬN & YÊU CẦU DẠNG BÀI CHI TIẾT]:\n${matrixComments}% ===================================================================\n\n`;
 
+        let docOpts = "11pt,a4paper";
+        let geometryOpts = "\\usepackage[margin=1cm, top=1.2cm, bottom=1.2cm]{geometry}";
         let fontStr = (fontOpt === 'times') ? '\\usepackage{mathptmx}' : (fontOpt === 'palatino' ? '\\usepackage{mathpazo}' : '% Computer Modern (Default)');
+        
         let colorStr = "\\definecolor{MainColor}{HTML}{003366}\n\\definecolor{HighlightColor}{HTML}{C90016}";
         if (colorOpt === '2') colorStr = "\\definecolor{MainColor}{HTML}{2C3E50}\n\\definecolor{HighlightColor}{HTML}{27AE60}";
         if (colorOpt === '3') colorStr = "\\definecolor{MainColor}{HTML}{311B92}\n\\definecolor{HighlightColor}{HTML}{0277BD}";
@@ -513,25 +533,43 @@ NHIỆM VỤ CỦA BẠN:
         if (colorOpt === '5') colorStr = "\\definecolor{MainColor}{HTML}{006064}\n\\definecolor{HighlightColor}{HTML}{F39C12}";
         if (colorOpt === '6') colorStr = "\\definecolor{MainColor}{HTML}{212121}\n\\definecolor{HighlightColor}{HTML}{E53935}";
 
+        if (layoutOpt === "4") {
+            docOpts = "12pt,a5paper";
+            // Tịnh tiến footer lên trên để dễ nhìn bằng cách tăng bottom margin và chỉnh footskip
+            geometryOpts = "\\usepackage[margin=1cm, top=1cm, bottom=2cm, footskip=0.8cm]{geometry}";
+            // Mặc định màu Xanh dương chủ đạo cho A5
+            colorStr = "\\definecolor{MainColor}{HTML}{0056b3}\n\\definecolor{HighlightColor}{HTML}{E63946}";
+        }
+
         let layoutPackage = ""; let envDefs = "";
 
-        if (layoutOpt === "3") { 
+        if (layoutOpt === "3" || layoutOpt === "4") { 
             layoutPackage = "\\usepackage[many]{tcolorbox}";
-            let boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
-            let boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
+            let boxOpts = "";
+            let boxOptsTL = "";
+            
+            if (layoutOpt === "3") {
+                boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
+                boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
+            } else { // Option 4 Mobile A5
+                boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=4mm}, boxed title style={colback=MainColor, arc=2mm, boxrule=0pt}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm, drop shadow]";
+                boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=4mm}, boxed title style={colback=MainColor, arc=2mm, boxrule=0pt}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm, drop shadow]";
+            }
             
             envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOptsTL} \\BODY \\end{tcolorbox} \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}`;
         } else {
-            envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\BODY \\par \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
-\\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\BODY \\par \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
-\\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\BODY \\par \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
-\\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1 (#2).}} \\BODY \\par \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}`;
+            envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1 (#2).}} \\ignorespaces \\BODY \\par \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}`;
         }
 
         let latexHeader = document.getElementById('latex-header').textContent.trim()
+            .replace('{{DOC_OPTS}}', docOpts)
+            .replace('{{GEOMETRY_OPTS}}', geometryOpts)
             .replace('{{FONT_PACKAGE}}', fontStr).replace('{{COLOR_PALETTE}}', colorStr)
             .replace('{{LAYOUT_PACKAGE}}', layoutPackage).replace('{{ENV_DEFINITIONS}}', envDefs);
         
@@ -554,28 +592,44 @@ NHIỆM VỤ CỦA BẠN:
             for (let i = 0; i < soluong; i++) {
                 if (loaicau === "1") {
                     if(coHinh) {
-                        p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exI}{${q1}}{A}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài vào đây (Văn bản sẽ tự động ôm mượt mà sang mép trái hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các phương án trắc nghiệm bị đè lên hình vẽ\n\\choiceTwo % Dùng \\choiceTwo hoặc \\choiceOne\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
+                        if (layoutOpt === "4") {
+                            p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exI}{${q1}}{A}\nNhập đề bài vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY (Căn giữa, tự động không đè lề)\n    \\end{tikzpicture}\n\\end{center}\n\\choiceTwo % Dùng \\choiceTwo hoặc \\choiceOne\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
+                        } else {
+                            p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exI}{${q1}}{A}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài vào đây (Văn bản sẽ tự động ôm mượt mà sang mép trái hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các phương án trắc nghiệm bị đè lên hình vẽ\n\\choiceTwo % Dùng \\choiceTwo hoặc \\choiceOne\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
+                        }
                     } else {
                         p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo}\n\\begin{exI}{${q1}}{A}\nNhập đề bài vào đây...\n\\choice % AI tự động đổi thành \\choiceTwo hoặc \\choiceOne nếu quá dài\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
                     }
                     q1++;
                 } else if (loaicau === "2") {
                     if(coHinh) {
-                        p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các mệnh đề a,b,c,d bên dưới bị đè lên hình vẽ\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
+                        if (layoutOpt === "4") {
+                            p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n    \\end{tikzpicture}\n\\end{center}\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
+                        } else {
+                            p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các mệnh đề a,b,c,d bên dưới bị đè lên hình vẽ\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
+                        }
                     } else {
                         p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo}\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây...\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
                     }
                     q2++;
                 } else if (loaicau === "3") {
                     if(coHinh) {
-                        p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài câu trả lời ngắn vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
+                        if (layoutOpt === "4") {
+                            p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\nNhập đề bài câu trả lời ngắn vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n    \\end{tikzpicture}\n\\end{center}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
+                        } else {
+                            p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài câu trả lời ngắn vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
+                        }
                     } else {
                         p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo}\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\nNhập đề bài câu trả lời ngắn vào đây...\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
                     }
                     q3++;
                 } else if (loaicau === "4") {
                     if(coHinh) {
-                        p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exTL}{${q4}}{[Điền số điểm]}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài tự luận vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
+                        if (layoutOpt === "4") {
+                            p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exTL}{${q4}}{[Điền số điểm]}\nNhập đề bài tự luận vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n    \\end{tikzpicture}\n\\end{center}\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
+                        } else {
+                            p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exTL}{${q4}}{[Điền số điểm]}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài tự luận vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
+                        }
                     } else {
                         p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo}\n\\begin{exTL}{${q4}}{[Điền số điểm]}\nNhập đề bài tự luận vào đây...\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
                     }
