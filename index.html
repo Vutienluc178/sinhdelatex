@@ -213,7 +213,10 @@
         </div>
     </div>
     
-    <button class="btn btn-generate" onclick="shuffleExams()" style="background-color: #e67e22;">🔀 BƯỚC 2: TIẾN HÀNH TRỘN ĐỀ & TẠO EXCEL</button>
+    <div style="display: flex; gap: 10px; margin-top: 5px;">
+        <button class="btn btn-generate" onclick="shuffleExams()" style="background-color: #e67e22; flex: 1; margin-top: 10px;">🔀 BƯỚC 2: TIẾN HÀNH TRỘN ĐỀ & TẠO EXCEL</button>
+        <button class="btn btn-generate" onclick="convertTo169()" style="background-color: #16a085; flex: 1; margin-top: 10px;">🖥️ CHUYỂN MÃ BÊN TRÊN VỀ BỐ CỤC 16:9 (TRÌNH CHIẾU)</button>
+    </div>
 
     <div id="shuffledResultSection" style="display: none; margin-top: 30px;">
         <h2>5. KẾT QUẢ TRỘN ĐỀ</h2>
@@ -940,9 +943,86 @@ NHIỆM VỤ CỦA BẠN:
         
         globalExcelData = transposedCsv;
 
+        document.querySelector('#shuffledResultSection h2').innerText = "5. KẾT QUẢ TRỘN ĐỀ";
         document.getElementById('outputShuffledLatex').value = fullShuffledLatex;
         document.getElementById('shuffledResultSection').style.display = 'block';
         document.getElementById('shuffledResultSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function convertTo169() {
+        const sourceLatex = document.getElementById('aiSourceLatex').value;
+        if (!sourceLatex.includes('\\begin{document}')) {
+            alert("Lỗi: Mã LaTeX không hợp lệ. Thầy vui lòng copy đầy đủ từ \\documentclass đến \\end{document} rồi mới chuyển đổi nhé.");
+            return;
+        }
+
+        const preambleMatch = sourceLatex.split('\\begin{document}');
+        let preamble = preambleMatch[0];
+        let docBody = preambleMatch[1].split('\\end{document}')[0];
+
+        let topPreamble = preamble.split("\\newcommand{\\listdaI}")[0];
+        
+        topPreamble = topPreamble.replace(/\\documentclass\[.*?\]\{article\}/, "\\documentclass[12pt]{article}");
+        topPreamble = topPreamble.replace(/\\usepackage\[.*?\]\{geometry\}/, "\\usepackage[paperwidth=16cm, paperheight=9cm, margin=0.6cm, bottom=1cm, footskip=0.4cm]{geometry}");
+        
+        topPreamble = topPreamble.replace(/\\definecolor\{MainColor\}[^\n]*\n/g, "");
+        topPreamble = topPreamble.replace(/\\definecolor\{HighlightColor\}[^\n]*\n/g, "");
+        topPreamble = topPreamble.replace(/\\definecolor\{MathColor\}[^\n]*\n/g, "");
+        topPreamble = topPreamble.replace(/\\everymath[^\n]*\n/g, "");
+        topPreamble = topPreamble.replace(/\\everydisplay[^\n]*\n/g, "");
+
+        let newColors = "\\definecolor{MainColor}{HTML}{0056b3}\n\\definecolor{HighlightColor}{HTML}{E63946}\n\\definecolor{MathColor}{HTML}{0056b3}\n\\everymath{\\color{MathColor}}\\everydisplay{\\color{MathColor}}\n";
+
+        let envDefs = `\\newcommand{\\filllines}{%
+    \\par\\vspace{0.3cm}%
+    \\begingroup\\color{gray!40}%
+    \\leaders\\vbox to 0.8cm{\\vfill\\hrule}\\vfill\\null%
+    \\endgroup\\newpage
+}
+\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}
+\\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}
+\\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}
+\\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1 (#2).}} \\ignorespaces \\BODY \\par \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}`;
+
+        let midPreamble = `\\newcommand{\\listdaI}{} \\newcommand{\\listdaII}{} \\newcommand{\\listdaIII}{} 
+\\newcommand{\\listsolI}{} \\newcommand{\\listsolII}{} \\newcommand{\\listsolIII}{} \\newcommand{\\listsolIV}{}
+
+% Lệnh chèn thang điểm (Dạt sang lề phải)
+\\newcommand{\\diem}[1]{\\hfill \\textcolor{HighlightColor}{\\textbf{(#1 đ)}}}
+
+\\pagestyle{fancy} \\fancyhf{} \\renewcommand{\\headrulewidth}{0pt} 
+\\fancyfoot[L]{\\footnotesize \\textcolor{MainColor}{\\textbf{Mã đề 101}}} 
+\\fancyfoot[R]{\\footnotesize \\textcolor{MainColor}{\\textit{Trang \\thepage}}}
+
+\\settasks{label=\\textbf{\\Alph*.}, item-indent=0.6cm, label-width=0.4cm, before-skip=0pt, after-item-skip=0pt}
+\\newcommand{\\loigiai}[1]{} 
+\\newcommand{\\choice}[4]{\\begin{tasks}(4) \\task #1 \\task #2 \\task #3 \\task #4 \\end{tasks}}
+\\newcommand{\\choiceTwo}[4]{\\begin{tasks}(2) \\task #1 \\task #2 \\task #3 \\task #4 \\end{tasks}}
+\\newcommand{\\choiceOne}[4]{\\begin{tasks}(1) \\task #1 \\task #2 \\task #3 \\task #4 \\end{tasks}}
+\\newcommand{\\choiceTF}[4]{\\begin{enumerate}[label=\\textbf{\\alph*)}, leftmargin=0.8cm, itemsep=0pt, topsep=0pt] \\item #1 \\item #2 \\item #3 \\item #4 \\end{enumerate}}\n\n`;
+
+        let newPreamble = topPreamble + newColors + midPreamble + envDefs + "\n";
+
+        // Xóa chia 2 cột nếu có
+        docBody = docBody.replace(/\\begin\{multicols\}\{2\}/g, "");
+        docBody = docBody.replace(/\\end\{multicols\}/g, "");
+
+        // Chuyển đổi khối hình hangafter sang begin{center}
+        const robustHangRegex = /\\hangafter=-\d+[^]*?\\makebox\[0pt\]\[l\]\{[^]*?\\raisebox\{[^}]+\}\[0pt\]\[0pt\]\{[^]*?(\\begin\{tikzpicture\}[^]*?\\end\{tikzpicture\})%?\s*\}%?\s*\}%?/g;
+        docBody = docBody.replace(robustHangRegex, "\\begin{center}\n    $1\n\\end{center}");
+        
+        // Tự động thu nhỏ hình để vừa màn chiếu
+        docBody = docBody.replace(/\\begin\{tikzpicture\}\[scale=0\.[5-9]/g, "\\begin{tikzpicture}[scale=0.45");
+
+        let fullLatex = newPreamble + "\\begin{document}\n" + docBody + "\\end{document}";
+        
+        document.querySelector('#shuffledResultSection h2').innerText = "5. KẾT QUẢ MÃ LATEX ĐÃ CHUYỂN ĐỔI SANG BỐ CỤC 16:9 (TRÌNH CHIẾU)";
+        document.getElementById('outputShuffledLatex').value = fullLatex;
+        document.getElementById('shuffledResultSection').style.display = 'block';
+        document.getElementById('shuffledResultSection').scrollIntoView({ behavior: 'smooth' });
+        
+        // Cảnh báo không có xuất Excel khi chỉ chuyển đổi
+        globalExcelData = [];
     }
 
     function downloadExcel() {
