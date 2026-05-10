@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Sinh Thái LaTeX: Sinh Đề & Trộn Đề 2025</title>
+    <!-- Tích hợp thư viện SheetJS để xuất/nhập file Excel (.xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --accent: #e74c3c;
+            --bg: #f4f6f9;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0; padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        h1 { color: var(--primary); text-align: center; border-bottom: 3px solid var(--secondary); padding-bottom: 15px; margin-bottom: 30px;}
+        h2 { color: var(--primary); font-size: 1.2rem; margin-top: 30px; border-left: 4px solid var(--secondary); padding-left: 10px; background: #f8f9fa; padding: 10px;}
+        
+        .grid-2 { display: grid; gap: 20px; margin-bottom: 20px; grid-template-columns: 1fr 1fr; }
+        
+        .form-group { display: flex; flex-direction: column; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee;}
+        label { font-weight: 600; margin-bottom: 8px; color: var(--primary); }
+        input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; transition: 0.3s; font-family: inherit;}
+        input:focus, select:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);}
+        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff;}
+        th, td { border: 1px solid #e0e0e0; padding: 10px; text-align: center; }
+        td:first-child, td:nth-child(2) { text-align: left; }
+        th { background-color: var(--primary); color: white; font-weight: 500;}
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s;}
+        .btn-add { background-color: var(--secondary); color: white; margin-bottom: 10px;}
+        .btn-add:hover { background-color: #219150; }
+        .btn-remove { background-color: var(--accent); color: white; padding: 8px 12px; font-size: 12px;}
+        .btn-generate { background-color: var(--primary); color: white; width: 100%; font-size: 18px; padding: 18px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .btn-generate:hover { background-color: #1a252f; transform: translateY(-2px);}
+        .btn-copy { background-color: var(--secondary); color: white; margin-top: 15px; }
+        
+        #outputLatex, #outputShuffledLatex { width: 100%; height: 300px; margin-top: 15px; padding: 15px; font-family: 'Consolas', monospace; border: 2px solid var(--primary); border-radius: 8px; background: #282c34; color: #abb2bf; resize: vertical; box-sizing: border-box; line-height: 1.4;}
+        
+        .preset-container { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .preset-btn { background: #3498db; padding: 10px 15px; margin: 0; white-space: nowrap; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;}
+        .preset-btn:hover { background: #2980b9; }
+        .preset-btn.purple { background: #9b59b6; }
+        .preset-btn.purple:hover { background: #8e44ad; }
+        .preset-btn.orange { background: #f39c12; }
+        .preset-btn.orange:hover { background: #d68910; }
+        .preset-btn.dark { background: #34495e; }
+        .preset-btn.dark:hover { background: #2c3e50; }
+        .preset-btn.red { background: #e74c3c; }
+        .preset-btn.red:hover { background: #c0392b; }
+        
+        .import-section { border: 2px dashed var(--secondary); background-color: #f9fdfa; padding: 15px; border-radius: 8px; margin-bottom: 20px;}
+        .import-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;}
+
+        /* CSS Mới cho Tác giả và Menu Liên kết */
+        .author-info { text-align: center; font-size: 1.15rem; color: var(--primary); margin-top: -15px; margin-bottom: 15px; }
+        .nav-links { text-align: center; margin-bottom: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .nav-btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #34495e; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .nav-btn:hover { background-color: var(--secondary); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>HỆ SINH THÁI LATEX: SINH ĐỀ & TRỘN ĐỀ</h1>
+    
+    <div class="author-info">
+        Tác giả: <strong>Thầy Vũ Tiến Lực</strong> - Trường THPT Nguyễn Hữu Cảnh
+    </div>
+
+    <div class="nav-links">
+        <a href="https://nganhangbaihoc.vercel.app/" target="_blank" class="nav-btn">🌐 1. Ngân Hàng Bài Học</a>
+        <a href="https://prism.openai.com/" target="_blank" class="nav-btn">🧠 2. Prism OpenAI</a>
+        <a href="https://www.overleaf.com/" target="_blank" class="nav-btn">✍️ 3. Biên dịch Overleaf</a>
+    </div>
+
+    <p style="text-align: center; color: #7f8c8d; font-style: italic;">*Tích hợp tính năng Nạp Ma trận siêu tốc từ Excel & Google Sheets</p>
+    
+    <!-- PHẦN A: SINH PROMPT CHO AI -->
+    <h2>1. THÔNG TIN TIÊU ĐỀ & ĐỊNH DẠNG</h2>
+    <div class="grid-2">
+        <div class="form-group"><label>Sở GD&ĐT / Tên Trường</label><input type="text" id="truong" value="TRƯỜNG THPT NGUYỄN HỮU CẢNH"></div>
+        <div class="form-group"><label>Tên Kỳ Thi / Chủ Đề Bài Học</label><input type="text" id="kythi" value="ĐỀ KIỂM TRA TỰ LUẬN"></div>
+        <div class="form-group"><label>Môn - Lớp</label><input type="text" id="monlop" value="Môn: TOÁN - Lớp: 12"></div>
+        <div class="form-group"><label>Thời gian làm bài (phút)</label><input type="number" id="thoigian" value="45"></div>
+        <div class="form-group">
+            <label>Template Màu Sắc</label>
+            <select id="colorTemplate">
+                <option value="1">1. Xanh Navy & Đỏ Crimson (Học thuật)</option>
+                <option value="2">2. Than chì & Xanh lá (Hiện đại)</option>
+                <option value="3">3. Tím than & Xanh đại dương (Dịu mắt)</option>
+                <option value="4">4. Nâu Đất & Cam Cháy (Cổ điển, ấm áp)</option>
+                <option value="5">5. Xanh Cổ Vịt & Vàng Kim (Sang trọng)</option>
+                <option value="6">6. Đen Tuyền & Đỏ Tươi (Tương phản, mạnh mẽ)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Font chữ</label>
+            <select id="fontStyle">
+                <option value="default">1. Computer Modern (Mặc định)</option>
+                <option value="times">2. Times New Roman (Quen thuộc)</option>
+                <option value="palatino">3. Palatino (Thanh lịch)</option>
+            </select>
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+            <label>Bố cục đề thi (Layout Design)</label>
+            <select id="layoutStyle" style="border: 2px solid var(--secondary); background-color: #f0fdf4;">
+                <option value="1">1. Chuẩn tinh tế (1 Cột, Truyền thống, Dễ nhìn nhất)</option>
+                <option value="2">2. Tiết kiệm không gian (Chia 2 cột dọc, Giống đề thi thật)</option>
+                <option value="3">3. Khung viền hiện đại (Tcolorbox cao cấp, Sang trọng, Đóng khung từng câu)</option>
+            </select>
+        </div>
+    </div>
+
+    <h2>2. XÂY DỰNG MA TRẬN YÊU CẦU AI</h2>
+    
+    <!-- TÍNH NĂNG NHẬP LIỆU TỪ EXCEL / GOOGLE SHEETS -->
+    <div class="import-section">
+        <label style="color: var(--secondary); font-weight: bold; font-size: 1.1rem;">📥 NHẬP MA TRẬN HÀNG LOẠT TỪ EXCEL / GOOGLE SHEETS</label>
+        <div class="import-controls">
+            <button class="btn btn-copy" style="margin-top: 0; background-color: #27ae60;" onclick="downloadTemplateExcel()">1. Tải File Mẫu (.xlsx)</button>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelUpload(event)">
+            <button class="btn btn-copy" style="margin-top: 0; background-color: #f39c12;" onclick="document.getElementById('excelFileInput').click()">2. Upload File Excel Lên</button>
+            <span style="font-weight: bold; margin: 0 10px; color: #7f8c8d;">HOẶC</span>
+            <input type="text" id="gsheetLink" placeholder="Dán link Google Sheets vào đây..." style="flex-grow: 1; min-width: 200px; border-color: #3498db;">
+            <button class="btn btn-copy" style="margin-top: 0; background-color: #3498db;" onclick="importFromGoogleSheet()">3. Nạp Từ Link</button>
+        </div>
+        <p style="font-size: 12px; color: #7f8c8d; margin-top: 8px; margin-bottom: 0;">*Lưu ý: Nếu thầy dùng link Google Sheets, hãy đảm bảo Sheet đó đã được bật quyền <b>"Bất kỳ ai có liên kết đều xem được"</b> (Anyone with the link).</p>
+    </div>
+
+    <div class="preset-container">
+        <span style="font-weight: bold; color: var(--primary);">Nạp Nhanh Cấu Trúc:</span>
+        <button class="btn btn-copy preset-btn" onclick="loadPreset('15min')">⏱️ 15 Phút</button>
+        <button class="btn btn-copy preset-btn" onclick="loadPreset('45min')">⏱️ 45 Phút (I + III)</button>
+        <button class="btn btn-copy preset-btn orange" onclick="loadPreset('60min')">📄 Giữa Kỳ (60')</button>
+        <button class="btn btn-copy preset-btn purple" onclick="loadPreset('90min')">🎓 Cuối Kỳ (90')</button>
+        <button class="btn btn-copy preset-btn red" onclick="loadPreset('tuluan')">✍️ Tự Luận</button>
+    </div>
+
+    <button class="btn btn-add" onclick="addRow()">+ Thêm Dòng Thủ Công</button>
+    <div style="overflow-x: auto;">
+        <table id="matrixTable">
+            <thead>
+                <tr>
+                    <th style="min-width: 150px;">Chủ đề bài học</th>
+                    <th style="min-width: 250px;">Chi tiết dạng bài (Mồi cho AI)</th>
+                    <th>Mức độ</th>
+                    <th style="min-width: 180px;">Loại Câu Hỏi</th>
+                    <th style="width: 70px;">SL</th>
+                    <th>Hình<br>(TikZ)</th>
+                    <th>Xóa</th>
+                </tr>
+            </thead>
+            <tbody id="matrixBody"></tbody>
+        </table>
+    </div>
+
+    <div class="form-group" style="margin-top: 20px;">
+        <label>Ghi chú tổng thể (Sẽ áp dụng cho toàn bộ đề thi)</label>
+        <textarea id="additionalNotes" placeholder="VD: Yêu cầu AI đảm bảo nghiệm của phương trình phải là số nguyên, không ra số thập phân lẻ, ưu tiên đưa vào 2-3 bài toán ứng dụng thực tế sinh động..."></textarea>
+    </div>
+
+    <button class="btn btn-generate" onclick="generateTemplateLatex()">⚡ BƯỚC 1: XUẤT PROMPT ĐỂ AI SINH ĐỀ ⚡</button>
+
+    <div id="resultSection" style="display: none; margin-top: 30px;">
+        <h2>3. PROMPT ĐỂ GỬI CHO AI (ChatGPT, Claude, Gemini...)</h2>
+        <button class="btn btn-copy" onclick="copyLatex('outputLatex')" style="background-color: #8e44ad;">🤖 Copy Toàn Bộ Prompt Gửi AI</button>
+        <textarea id="outputLatex" readonly placeholder="Toàn bộ lệnh yêu cầu AI sẽ hiện ở đây..."></textarea>
+    </div>
+
+    <hr style="margin: 50px 0; border: 2px dashed #bdc3c7;">
+
+    <!-- PHẦN B: TÍNH NĂNG TRỘN ĐỀ CAO CẤP -->
+    <h2 style="color: #e67e22; border-left: 4px solid #e67e22;">4. TÍNH NĂNG NÂNG CAO: TRỘN ĐỀ & XUẤT EXCEL CHẤM THI</h2>
+    <p style="color: var(--primary);">Sau khi AI (ở Bước 3) sinh xong đề hoàn chỉnh, thầy hãy copy đoạn mã LaTeX đó dán vào đây để hệ thống tự động hoán vị sinh ra nhiều mã đề.</p>
+    
+    <div class="form-group" style="border: 2px solid #e67e22; background-color: #fff9f5;">
+        <label style="color: #e67e22;">Dán mã LaTeX gốc từ AI vào đây:</label>
+        <textarea id="aiSourceLatex" placeholder="Dán mã LaTeX hoàn chỉnh do ChatGPT/Claude sinh ra (Phải bắt đầu từ \documentclass và kết thúc bằng \end{document})..." style="height: 150px;"></textarea>
+    </div>
+    
+    <div class="grid-2">
+        <div class="form-group">
+            <label>Số lượng mã đề cần trộn:</label>
+            <input type="number" id="numExams" value="4" min="1" max="24">
+        </div>
+        <div class="form-group">
+            <label>Mã đề bắt đầu:</label>
+            <input type="number" id="startCode" value="101" min="1">
+        </div>
+        <div class="form-group" style="grid-column: span 2; flex-direction: row; align-items: center; gap: 10px; background-color: #e8f8f5; border: 1px dashed #27ae60;">
+            <input type="checkbox" id="includeSolution" checked style="width: 22px; height: 22px; cursor: pointer;">
+            <label style="margin: 0; cursor: pointer; color: #27ae60; font-size: 15px;" for="includeSolution">In kèm <b>Hướng dẫn giải chi tiết</b> theo đúng thứ tự câu hỏi ở cuối mỗi mã đề (Dùng để phát cho học sinh tham khảo)</label>
+        </div>
+    </div>
+    
+    <button class="btn btn-generate" onclick="shuffleExams()" style="background-color: #e67e22;">🔀 BƯỚC 2: TIẾN HÀNH TRỘN ĐỀ & TẠO EXCEL</button>
+
+    <div id="shuffledResultSection" style="display: none; margin-top: 30px;">
+        <h2>5. KẾT QUẢ TRỘN ĐỀ</h2>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-copy" onclick="copyLatex('outputShuffledLatex')">📋 Copy Mã LaTeX Đã Trộn</button>
+            <button class="btn btn-copy" onclick="downloadExcel()" style="background-color: #27ae60;">📊 Tải File Excel Đáp Án (.xlsx)</button>
+        </div>
+        <textarea id="outputShuffledLatex" readonly placeholder="Mã LaTeX của tất cả các mã đề đã trộn sẽ hiện ở đây..."></textarea>
+    </div>
+</div>
+
+<!-- LÕI CẤU TRÚC LATEX -->
+<script id="latex-header" type="text/plain">
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+{{FONT_PACKAGE}}
+\usepackage{amsmath, amssymb, mathrsfs, amsthm}
+\usepackage{tikz}
+\usepackage{tasks}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{multicol} 
+\usepackage{etoolbox} 
+\usepackage{graphicx}
+\usepackage{environ} 
+{{LAYOUT_PACKAGE}}
+\usepackage[margin=1cm, top=1.2cm, bottom=1.2cm]{geometry}
+
+{{COLOR_PALETTE}}
+
+\newif\ifprintkey \newif\ifprintsol
+\printkeytrue \printsoltrue  
+
+\newcommand{\listdaI}{} \newcommand{\listdaII}{} \newcommand{\listdaIII}{} 
+\newcommand{\listsolI}{} \newcommand{\listsolII}{} \newcommand{\listsolIII}{} \newcommand{\listsolIV}{}
+
+% Lệnh chèn thang điểm (Dạt sang lề phải)
+\newcommand{\diem}[1]{\hfill \textcolor{HighlightColor}{\textbf{(#1 đ)}}}
+
+\pagestyle{fancy} \fancyhf{} \renewcommand{\headrulewidth}{0pt} 
+\fancyfoot[L]{\footnotesize \textcolor{MainColor}{\textbf{Mã đề 101}}} 
+\fancyfoot[R]{\footnotesize \textcolor{MainColor}{\textit{Trang \thepage}}}
+
+\settasks{label=\textbf{\Alph*.}, item-indent=0.6cm, label-width=0.4cm, before-skip=0pt, after-item-skip=0pt}
+\newcommand{\loigiai}[1]{} 
+\newcommand{\choice}[4]{\begin{tasks}(4) \task #1 \task #2 \task #3 \task #4 \end{tasks}}
+\newcommand{\choiceTwo}[4]{\begin{tasks}(2) \task #1 \task #2 \task #3 \task #4 \end{tasks}}
+\newcommand{\choiceOne}[4]{\begin{tasks}(1) \task #1 \task #2 \task #3 \task #4 \end{tasks}}
+\newcommand{\choiceTF}[4]{\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=0.8cm, itemsep=0pt, topsep=0pt] \item #1 \item #2 \item #3 \item #4 \end{enumerate}}
+
+{{ENV_DEFINITIONS}}
+
+\begin{document}
+</script>
+
+<script>
+    // ==========================================
+    // KHỐI TÍNH NĂNG IMPORT MA TRẬN
+    // ==========================================
+
+    function downloadTemplateExcel() {
+        const templateData = [
+            ["Chủ đề bài học (Ví dụ: Cực trị hàm số)", "Chi tiết dạng bài (Ví dụ: Tìm m để hàm số đạt cực trị tại x0)", "Mức độ (Nhận biết/Thông hiểu/Vận dụng/Vận dụng cao)", "Loại Câu (1=Trắc nghiệm, 2=Đúng Sai, 3=Ngắn, 4=Tự luận)", "Số Lượng", "Có Hình Vẽ (1=Có, 0=Không)"],
+            ["Cực trị của hàm số", "Tìm m để hàm số đạt cực trị tại x0", "Thông hiểu", "1", "6", "0"],
+            ["Tiệm cận", "Bài toán liên quan đến đồ thị hoặc bảng biến thiên", "Vận dụng", "1", "6", "1"],
+            ["Khảo sát hàm số", "Tìm GTLN, GTNN trên đoạn", "Vận dụng", "3", "4", "0"],
+            ["Hình học không gian", "Tính thể tích khối chóp, khoảng cách", "Vận dụng cao", "4", "1", "1"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(templateData);
+        ws['!cols'] = [{wch:25}, {wch:50}, {wch:15}, {wch:25}, {wch:10}, {wch:15}]; // Định dạng độ rộng cột
+        
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "MaTranTemplate");
+        XLSX.writeFile(wb, "Template_MaTran_DeThi.xlsx");
+    }
+
+    function handleExcelUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                processExcelWorkbook(workbook);
+                alert("Nạp dữ liệu từ File Excel thành công!");
+            } catch (error) {
+                alert("Đã xảy ra lỗi khi đọc file. Vui lòng đảm bảo file đúng định dạng Excel mẫu.");
+            }
+            document.getElementById('excelFileInput').value = ""; // Reset input
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    async function importFromGoogleSheet() {
+        const link = document.getElementById('gsheetLink').value.trim();
+        if (!link) {
+            alert("Thầy vui lòng dán link Google Sheets vào ô trống nhé!");
+            return;
+        }
+
+        const match = link.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (!match) {
+            alert("Link không hợp lệ. Vui lòng copy đúng đường dẫn Google Sheets.");
+            return;
+        }
+        
+        const sheetId = match[1];
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+        
+        try {
+            document.getElementById('gsheetLink').value = "Đang tải dữ liệu, thầy chờ chút nhé...";
+            const response = await fetch(csvUrl);
+            if (!response.ok) {
+                throw new Error("Không thể tải dữ liệu. Thầy nhớ kiểm tra xem file Google Sheets đã mở quyền 'Bất kỳ ai có liên kết' (Anyone with the link) chưa nhé!");
+            }
+            
+            const arrayBuffer = await response.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, {type: 'array'});
+            
+            processExcelWorkbook(workbook);
+            document.getElementById('gsheetLink').value = "";
+            alert("Nạp dữ liệu từ Google Sheets thành công rực rỡ!");
+            
+        } catch (error) {
+            document.getElementById('gsheetLink').value = link; 
+            alert(error.message || "Đã xảy ra lỗi khi tải Google Sheets.");
+        }
+    }
+
+    function processExcelWorkbook(workbook) {
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1}); 
+        
+        if (jsonData.length <= 1) {
+            alert("File trống hoặc không có dữ liệu để nạp.");
+            return;
+        }
+
+        const tbody = document.getElementById('matrixBody');
+        tbody.innerHTML = ''; 
+
+        for (let i = 1; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (!row || row.length === 0 || (!row[0] && !row[1])) continue;
+
+            const chude = row[0] || "";
+            const chitiet = row[1] || "";
+            
+            let mucdoRaw = (row[2] || "Nhận biết").toString().toLowerCase();
+            let mucdo = "Nhận biết";
+            if (mucdoRaw.includes("hiểu")) mucdo = "Thông hiểu";
+            else if (mucdoRaw.includes("cao")) mucdo = "Vận dụng cao";
+            else if (mucdoRaw.includes("dụng")) mucdo = "Vận dụng";
+
+            let loaicauRaw = (row[3] || "1").toString();
+            let loaicau = "1";
+            if (loaicauRaw.includes("2") || loaicauRaw.toLowerCase().includes("sai")) loaicau = "2";
+            else if (loaicauRaw.includes("3") || loaicauRaw.toLowerCase().includes("ngắn")) loaicau = "3";
+            else if (loaicauRaw.includes("4") || loaicauRaw.toLowerCase().includes("luận")) loaicau = "4";
+
+            let soluong = parseInt(row[4]) || 1;
+
+            let coHinhRaw = (row[5] || "0").toString().toLowerCase().trim();
+            let coHinh = false;
+            if (coHinhRaw === "1" || coHinhRaw === "có" || coHinhRaw === "true" || coHinhRaw === "yes") {
+                coHinh = true;
+            }
+
+            addRowWithData(chude, chitiet, mucdo, loaicau, soluong, coHinh);
+        }
+    }
+
+    // ==========================================
+    // KHỐI TÍNH NĂNG SINH PROMPT VÀ PRESET CŨ
+    // ==========================================
+    function loadPreset(type) {
+        const tbody = document.getElementById('matrixBody');
+        tbody.innerHTML = ''; 
+        if (type === '15min') {
+            document.getElementById('kythi').value = 'ĐỀ KIỂM TRA 15 PHÚT';
+            document.getElementById('thoigian').value = '15';
+            addRowWithData('Chủ đề ôn tập', 'Các dạng cơ bản và thông hiểu thường gặp', 'Thông hiểu', '1', 10, false);
+        } else if (type === '45min') {
+            document.getElementById('kythi').value = 'ĐỀ KIỂM TRA 45 PHÚT';
+            document.getElementById('thoigian').value = '45';
+            addRowWithData('Cực trị của hàm số', 'Tìm m để hàm số đạt cực trị tại x0', 'Thông hiểu', '1', 6, false);
+            addRowWithData('Tiệm cận', 'Bài toán liên quan đến đồ thị hoặc bảng biến thiên', 'Vận dụng', '1', 6, true);
+            addRowWithData('Khảo sát hàm số', 'Tìm GTLN, GTNN trên đoạn', 'Vận dụng', '3', 4, false);
+        } else if (type === '60min') {
+            document.getElementById('kythi').value = 'ĐỀ KIỂM TRA GIỮA KỲ (60 PHÚT)';
+            document.getElementById('thoigian').value = '60';
+            addRowWithData('Phần chung', 'Kiểm tra lý thuyết, công thức cơ bản', 'Nhận biết', '1', 12, false);
+            addRowWithData('Vận dụng lý thuyết', 'Đọc bảng biến thiên, đồ thị để xét tính đúng sai', 'Thông hiểu', '2', 2, true);
+            addRowWithData('Toán thực tế', 'Ứng dụng toán học vào các bài toán thực tiễn', 'Vận dụng', '3', 4, false);
+        } else if (type === '90min') {
+            document.getElementById('kythi').value = 'ĐỀ THI KHẢO SÁT CHẤT LƯỢNG 2025';
+            document.getElementById('thoigian').value = '90';
+            addRowWithData('Chương 1', 'Các dạng cơ bản nhận biết đồ thị', 'Nhận biết', '1', 12, false);
+            addRowWithData('Chương 2', 'Cho hàm số, xét tính đúng sai các mệnh đề', 'Thông hiểu', '2', 4, true);
+            addRowWithData('Chương 3', 'Bài toán vận dụng thực tế tối ưu', 'Vận dụng', '3', 6, false);
+        } else if (type === 'tuluan') {
+            document.getElementById('kythi').value = 'ĐỀ KIỂM TRA TỰ LUẬN';
+            document.getElementById('thoigian').value = '45';
+            addRowWithData('Đại số / Giải tích', 'Giải phương trình, hệ phương trình, bài toán tìm tham số', 'Thông hiểu', '4', 2, false);
+            addRowWithData('Hình học', 'Tính khoảng cách, góc, thể tích...', 'Vận dụng', '4', 1, true);
+            addRowWithData('Bất đẳng thức / Cực trị', 'Bài toán phân loại học sinh', 'Vận dụng cao', '4', 1, false);
+        }
+    }
+
+    function addRowWithData(chude, chitiet, mucdo, loaicau, soluong, coHinh) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" class="chude" value="${chude}" placeholder="VD: Khối đa diện" style="width: 90%;"></td>
+            <td><input type="text" class="chitiet" value="${chitiet}" placeholder="VD: Cho chóp S.ABCD tính thể tích..." style="width: 95%; background-color: #fdfae6; border-color: #f1c40f;"></td>
+            <td><select class="mucdo"><option value="Nhận biết" ${mucdo==='Nhận biết'?'selected':''}>Nhận biết</option><option value="Thông hiểu" ${mucdo==='Thông hiểu'?'selected':''}>Thông hiểu</option><option value="Vận dụng" ${mucdo==='Vận dụng'?'selected':''}>Vận dụng</option><option value="Vận dụng cao" ${mucdo==='Vận dụng cao'?'selected':''}>Vận dụng cao</option></select></td>
+            <td><select class="loaicau">
+                <option value="1" ${loaicau==='1'?'selected':''}>Phần I (Trắc nghiệm 4 PA)</option>
+                <option value="2" ${loaicau==='2'?'selected':''}>Phần II (Đúng/Sai)</option>
+                <option value="3" ${loaicau==='3'?'selected':''}>Phần III (Trả lời ngắn)</option>
+                <option value="4" ${loaicau==='4'?'selected':''}>Phần Tự Luận (Có Thang điểm)</option>
+            </select></td>
+            <td><input type="number" class="soluong" min="1" value="${soluong}" style="width: 50px;"></td>
+            <td><input type="checkbox" class="co-hinh" ${coHinh?'checked':''}></td>
+            <td><button class="btn btn-remove" onclick="removeRow(this)">Xóa</button></td>`;
+        document.getElementById('matrixBody').appendChild(tr);
+    }
+
+    function addRow() { addRowWithData('', '', 'Nhận biết', '1', 1, false); }
+    function removeRow(btn) { btn.closest('tr').remove(); }
+
+    window.onload = () => { loadPreset('tuluan'); };
+
+    function generateTemplateLatex() {
+        const truong = document.getElementById('truong').value;
+        const kythi = document.getElementById('kythi').value;
+        const monlop = document.getElementById('monlop').value;
+        const thoigian = document.getElementById('thoigian').value;
+        const colorOpt = document.getElementById('colorTemplate').value;
+        const fontOpt = document.getElementById('fontStyle').value;
+        const layoutOpt = document.getElementById('layoutStyle').value;
+
+        let count1 = 0, count2 = 0, count3 = 0, count4 = 0;
+        let matrixComments = "";
+        const rows = document.querySelectorAll('#matrixBody tr');
+        let rowIndex = 1;
+
+        rows.forEach(row => {
+            const chude = row.querySelector('.chude').value || "Chủ đề tự chọn";
+            const chitiet = row.querySelector('.chitiet').value || "Sinh ngẫu nhiên dạng chuẩn";
+            const mucdo = row.querySelector('.mucdo').value;
+            const loaicau = row.querySelector('.loaicau').value;
+            const soluong = parseInt(row.querySelector('.soluong').value);
+            const coHinh = row.querySelector('.co-hinh').checked ? "[CÓ HÌNH VẼ TIKZ]" : "[Không hình]";
+            if (loaicau === "1") count1 += soluong;
+            else if (loaicau === "2") count2 += soluong;
+            else if (loaicau === "3") count3 += soluong;
+            else if (loaicau === "4") count4 += soluong;
+
+            let loaicauText = loaicau === "1" ? "Phần I (4 Lựa chọn)" : (loaicau === "2" ? "Phần II (Đúng/Sai)" : (loaicau === "3" ? "Phần III (Trả lời ngắn)" : "Phần Tự Luận"));
+            matrixComments += `% - CÂU/CỤM CÂU THỨ ${rowIndex}:\n%    + Chủ đề: ${chude}\n%    + Mức độ: ${mucdo}\n%    + Loại câu: ${loaicauText} | Số lượng: ${soluong} câu | ${coHinh}\n%    + YÊU CẦU DẠNG BÀI: "${chitiet}"\n%    --------------------------------------\n`;
+            rowIndex++;
+        });
+
+        let isOnlyTL = (count1 === 0 && count2 === 0 && count3 === 0 && count4 > 0);
+
+        const extraNotes = document.getElementById('additionalNotes').value.trim();
+        let instructionForAI = `Hãy đóng vai một GIÁO VIÊN TOÁN THỰC CHIẾN chuyên ra đề thi tại Việt Nam và là chuyên gia lập trình LaTeX. Tôi cung cấp bộ khung LaTeX trống, nhiệm vụ của bạn là sinh ra các câu hỏi điền vào khung.
+
+NHIỆM VỤ CỦA BẠN:
+1. BÁM SÁT CHI TIẾT MA TRẬN: Biên soạn chính xác số lượng, độ khó và ĐẶC BIỆT PHẢI TUÂN THỦ [YÊU CẦU DẠNG BÀI].
+2. KHÔNG THAY ĐỔI CẤU TRÚC LỆNH GỐC LaTeX. Dùng phẩy (,) cho số thập phân, chấm phẩy (;) cho tọa độ.
+3. QUY TẮC CHÈN HÌNH TIKZ CHỐNG LỖI GIÃN CHỮ (VÔ CÙNG QUAN TRỌNG): 
+   - Tuyệt đối KHÔNG DÙNG wrapfigure hay minipage. Tôi đã trang bị cho bạn thủ thuật \\hangafter và \\makebox. Kỹ thuật này giúp chữ tự động lượn vòng qua hình vẽ cực kỳ đẹp mắt mà KHÔNG BAO GIỜ bị giãn chữ.
+   - BẮT BUỘC thiết lập tỷ lệ VĂN BẢN CHIẾM 3/5 VÀ HÌNH VẼ CHIẾM 2/5 bằng cách dùng thông số \\linewidth tương đối:
+     + \\hangafter=-N (N là số dòng cần chừa trống bên phải, ví dụ -6)
+     + \\hangindent=-0.4\\linewidth (Chừa đúng 2/5 không gian lề phải cho hình)
+     + \\hspace{0.6\\linewidth} (Đẩy hình sang lề phải 3/5 khoảng trống)
+     + \\raisebox{-Zcm}[0pt][0pt] (Z là độ dịch chuyển kéo hình xuống dưới cho cân đối với dòng chữ đầu tiên)
+   - Đề bài phải được viết nối tiếp NGAY DƯỚI dấu } cuối cùng của khối \\makebox.
+4. ĐÁP ÁN TRẮC NGHIỆM: Không dùng \\choice nếu có hình vẽ (tránh bị hình đè). BẮT BUỘC dùng \\choiceTwo hoặc \\choiceOne. 
+   - MẸO: Nếu thấy đáp án bị hình đè, hãy chủ động chèn thêm lệnh \\vspace{...} vào cuối đề bài để đẩy đáp án xuống dưới vùng an toàn của hình.
+5. CÂU TỰ LUẬN (\\begin{exTL}): Tự phân bổ số điểm. Trong phần \\loigiai, trình bày chi tiết và BẮT BUỘC chèn lệnh \\diem{0.25}, \\diem{0.5}... ở cuối mỗi dòng chấm điểm. Lệnh \\diem{} sẽ tự dạt sang phải.`;
+
+        if (extraNotes) instructionForAI += `\n\n6. GHI CHÚ BỔ SUNG TỪ GIÁO VIÊN (RẤT QUAN TRỌNG):\n${extraNotes}\n`;
+        instructionForAI += `\n\nMÃ KHUNG LATEX BẠN CẦN LÀM VIỆC:\n\`\`\`latex\n`;
+
+        let aiPromptBlock = `% ===================================================================\n% [THÔNG TIN KỲ THI]: ${kythi}\n% [MÔN - LỚP]: ${monlop}\n% [THỜI GIAN]: ${thoigian} phút\n% [TỔNG SỐ CÂU PHẦN I]: ${count1} câu\n% [TỔNG SỐ CÂU PHẦN II]: ${count2} câu\n% [TỔNG SỐ CÂU PHẦN III]: ${count3} câu\n% [TỔNG SỐ CÂU TỰ LUẬN]: ${count4} câu\n%\n% [MA TRẬN & YÊU CẦU DẠNG BÀI CHI TIẾT]:\n${matrixComments}% ===================================================================\n\n`;
+
+        let fontStr = (fontOpt === 'times') ? '\\usepackage{mathptmx}' : (fontOpt === 'palatino' ? '\\usepackage{mathpazo}' : '% Computer Modern (Default)');
+        let colorStr = "\\definecolor{MainColor}{HTML}{003366}\n\\definecolor{HighlightColor}{HTML}{C90016}";
+        if (colorOpt === '2') colorStr = "\\definecolor{MainColor}{HTML}{2C3E50}\n\\definecolor{HighlightColor}{HTML}{27AE60}";
+        if (colorOpt === '3') colorStr = "\\definecolor{MainColor}{HTML}{311B92}\n\\definecolor{HighlightColor}{HTML}{0277BD}";
+        if (colorOpt === '4') colorStr = "\\definecolor{MainColor}{HTML}{5D4037}\n\\definecolor{HighlightColor}{HTML}{D35400}";
+        if (colorOpt === '5') colorStr = "\\definecolor{MainColor}{HTML}{006064}\n\\definecolor{HighlightColor}{HTML}{F39C12}";
+        if (colorOpt === '6') colorStr = "\\definecolor{MainColor}{HTML}{212121}\n\\definecolor{HighlightColor}{HTML}{E53935}";
+
+        let layoutPackage = ""; let envDefs = "";
+
+        if (layoutOpt === "3") { 
+            layoutPackage = "\\usepackage[many]{tcolorbox}";
+            let boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
+            let boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
+            
+            envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOptsTL} \\BODY \\end{tcolorbox} \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}`;
+        } else {
+            envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\BODY \\par \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\BODY \\par \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\BODY \\par \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
+\\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1 (#2).}} \\BODY \\par \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}`;
+        }
+
+        let latexHeader = document.getElementById('latex-header').textContent.trim()
+            .replace('{{FONT_PACKAGE}}', fontStr).replace('{{COLOR_PALETTE}}', colorStr)
+            .replace('{{LAYOUT_PACKAGE}}', layoutPackage).replace('{{ENV_DEFINITIONS}}', envDefs);
+        
+        let latexTitle = `\n% ================= BẮT ĐẦU TRANG ĐỀ THI =================\n\\noindent\n\\begin{minipage}[t]{0.45\\textwidth}\n    \\centering\n    \\footnotesize SỞ GD\\&ĐT TP HỒ CHÍ MINH\\newline\n    \\textcolor{MainColor}{\\textbf{${truong}}}\n\\end{minipage}\n\\hfill\n\\begin{minipage}[t]{0.45\\textwidth}\n    \\centering\n    \\footnotesize \\textcolor{HighlightColor}{\\textbf{${kythi}}}\\newline\n    \\textbf{${monlop}} | \\textit{Thời gian: ${thoigian} phút}\n\\end{minipage}\n\n\\vspace{0.2cm}\\noindent \n{\\footnotesize \\textbf{Họ tên thí sinh:} \\dotfill \\textbf{SBD:} \\dotfill \\textbf{Mã đề: 101}}\n\\vspace{0.1cm}\\newline\n\\textcolor{MainColor}{\\rule{\\textwidth}{1.5pt}}\n`;
+
+        let mColStart = (layoutOpt === "2") ? "\\begin{multicols}{2}\n" : "";
+        let mColEnd = (layoutOpt === "2") ? "\\end{multicols}\n" : "";
+
+        let p1Content = "", p2Content = "", p3Content = "", p4Content = "";
+        let q1 = 1, q2 = 1, q3 = 1, q4 = 1;
+
+        rows.forEach(row => {
+            const chude = row.querySelector('.chude').value; 
+            const chitiet = row.querySelector('.chitiet').value;
+            const mucdo = row.querySelector('.mucdo').value;
+            const loaicau = row.querySelector('.loaicau').value; 
+            const soluong = parseInt(row.querySelector('.soluong').value);
+            const coHinh = row.querySelector('.co-hinh').checked;
+            
+            for (let i = 0; i < soluong; i++) {
+                if (loaicau === "1") {
+                    if(coHinh) {
+                        p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exI}{${q1}}{A}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài vào đây (Văn bản sẽ tự động ôm mượt mà sang mép trái hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các phương án trắc nghiệm bị đè lên hình vẽ\n\\choiceTwo % Dùng \\choiceTwo hoặc \\choiceOne\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
+                    } else {
+                        p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo}\n\\begin{exI}{${q1}}{A}\nNhập đề bài vào đây...\n\\choice % AI tự động đổi thành \\choiceTwo hoặc \\choiceOne nếu quá dài\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
+                    }
+                    q1++;
+                } else if (loaicau === "2") {
+                    if(coHinh) {
+                        p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các mệnh đề a,b,c,d bên dưới bị đè lên hình vẽ\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
+                    } else {
+                        p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo}\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây...\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
+                    }
+                    q2++;
+                } else if (loaicau === "3") {
+                    if(coHinh) {
+                        p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài câu trả lời ngắn vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
+                    } else {
+                        p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo}\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\nNhập đề bài câu trả lời ngắn vào đây...\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
+                    }
+                    q3++;
+                } else if (loaicau === "4") {
+                    if(coHinh) {
+                        p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exTL}{${q4}}{[Điền số điểm]}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài tự luận vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
+                    } else {
+                        p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo}\n\\begin{exTL}{${q4}}{[Điền số điểm]}\nNhập đề bài tự luận vào đây...\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
+                    }
+                    q4++;
+                }
+            }
+        });
+
+        let part1 = count1 > 0 ? `\n% ----------------- PHẦN I -----------------\n\\vspace{0.2cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn.}}\\newline\n\\textit{\\textcolor{gray}{Mỗi câu hỏi thí sinh chỉ chọn một phương án.}}\n\n` + mColStart + p1Content + mColEnd : "";
+        let part2 = count2 > 0 ? `\n% ----------------- PHẦN II -----------------\n\\vspace{0.4cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN II. Câu trắc nghiệm đúng sai.}}\\newline\n\\textit{\\textcolor{gray}{Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.}}\n\n` + mColStart + p2Content + mColEnd : "";
+        let part3 = count3 > 0 ? `\n% ----------------- PHẦN III -----------------\n\\vspace{0.4cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN III. Câu trắc nghiệm trả lời ngắn.}}\\newline\n\\textit{\\textcolor{gray}{Viết câu trả lời vào ô tương ứng.}}\n\n` + mColStart + p3Content + mColEnd : "";
+        
+        let part4 = "";
+        if (count4 > 0) {
+            if (isOnlyTL) {
+                part4 = `\n% ----------------- ĐỀ THI TỰ LUẬN -----------------\n\n` + p4Content;
+            } else {
+                part4 = `\n% ----------------- PHẦN TỰ LUẬN -----------------\n\\vspace{0.4cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN TỰ LUẬN.}}\\newline\n\\textit{\\textcolor{gray}{Thí sinh trình bày chi tiết lời giải vào giấy kiểm tra.}}\n\n` + p4Content;
+            }
+        }
+
+        let answerSheet = `\n\\ifprintkey\n\\newpage \n\\begin{center} \\textcolor{MainColor}{\\textbf{\\Large BẢNG ĐÁP ÁN TỔNG HỢP}} \\end{center}\n\\vspace{0.4cm}\n`;
+        if (count1 > 0) answerSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN I.}}\\newline \\listdaI \\vspace{0.5cm}\\newline\n`;
+        if (count2 > 0) answerSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN II.}}\\newline \\listdaII \\vspace{0.5cm}\\newline\n`;
+        if (count3 > 0) answerSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN III.}}\\newline \\listdaIII\n`;
+        if (count1 === 0 && count2 === 0 && count3 === 0) answerSheet = ""; 
+        else answerSheet += `\\fi\n`;
+
+        let solSheet = `\n\\ifprintsol\n\\newpage \n\\begin{center} \\textcolor{MainColor}{\\textbf{\\Large HƯỚNG DẪN GIẢI VÀ THANG ĐIỂM CHI TIẾT}} \\end{center}\n\\vspace{0.4cm}\n\\renewcommand{\\loigiai}[1]{%\n    \\newline \\textbf{\\textcolor{HighlightColor}{Lời giải & Thang điểm:}} #1%\n    \\vspace{0.1cm}\\newline\\rule{0.3\\textwidth}{0.4pt}%\n}\n`;
+        if (count1 > 0) solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN I.}}\\newline \\listsolI \\vspace{0.5cm}\\newline\n`;
+        if (count2 > 0) solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN II.}}\\newline \\listsolII \\vspace{0.5cm}\\newline\n`;
+        if (count3 > 0) solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN III.}}\\newline \\listsolIII \\vspace{0.5cm}\\newline\n`;
+        if (count4 > 0) {
+            if (isOnlyTL) solSheet += `\\listsolIV\n`; 
+            else solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN TỰ LUẬN.}}\\newline \\listsolIV\n`;
+        }
+        solSheet += `\\fi\n`;
+
+        let latexFooter = `\n\\vspace{0.5cm}\n\\begin{center} \\textit{\\textcolor{gray}{--- Hết ---}} \\end{center}\n\n% Đóng file xuất Excel tự động\n\\immediate\\closeout\\excelans\n` + answerSheet + solSheet + `\n\\end{document}\n`;
+
+        let fullLatexCode = aiPromptBlock + latexHeader + "\n" + latexTitle + part1 + part2 + part3 + part4 + latexFooter;
+        
+        document.getElementById('outputLatex').value = instructionForAI + fullLatexCode + "\n```";
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyLatex(id) {
+        const output = document.getElementById(id);
+        output.select();
+        document.execCommand('copy');
+        alert('Tuyệt vời! Đã copy thành công.');
+    }
+
+    // --- KHỐI TÍNH NĂNG TRỘN ĐỀ VÀ XUẤT EXCEL (BƯỚC 2) ---
+    let globalExcelData = [];
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function parseExI(body, oldAns) {
+        let choiceMatch = body.match(/\\choice(One|Two)?\s*\{/);
+        if (!choiceMatch) return { newBody: body, newAns: oldAns };
+
+        let startIndex = choiceMatch.index;
+        let typeStr = choiceMatch[1] ? `\\choice${choiceMatch[1]}` : "\\choice";
+        let pos = startIndex + choiceMatch[0].length - 1;
+
+        let choices = [];
+        for (let i = 0; i < 4; i++) {
+            while(pos < body.length && body[pos] !== '{') pos++;
+            if (pos >= body.length) break;
+            let openBraces = 1;
+            let startBrace = pos;
+            pos++;
+            while(pos < body.length && openBraces > 0) {
+                if (body[pos] === '\\' && (body[pos+1] === '{' || body[pos+1] === '}')) pos += 2;
+                else if (body[pos] === '{') { openBraces++; pos++; }
+                else if (body[pos] === '}') { openBraces--; pos++; }
+                else pos++;
+            }
+            choices.push(body.substring(startBrace + 1, pos - 1));
+        }
+
+        let preChoice = body.substring(0, startIndex);
+        let postChoice = body.substring(pos);
+
+        let oldIndex = oldAns.trim().charCodeAt(0) - 65;
+        if (oldIndex < 0 || oldIndex > 3 || choices.length !== 4) return { newBody: body, newAns: oldAns };
+
+        let indices = [0, 1, 2, 3];
+        for (let i = 3; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+
+        let newIndex = indices.indexOf(oldIndex);
+        let newAns = String.fromCharCode(65 + newIndex);
+
+        let newChoicesStr = `\n${typeStr}\n{${choices[indices[0]]}}\n{${choices[indices[1]]}}\n{${choices[indices[2]]}}\n{${choices[indices[3]]}}`;
+
+        return {
+            newBody: preChoice + newChoicesStr + postChoice,
+            newAns: newAns
+        };
+    }
+
+    function shuffleExams() {
+        const sourceLatex = document.getElementById('aiSourceLatex').value;
+        if (!sourceLatex.includes('\\begin{document}')) {
+            alert("Lỗi: Mã LaTeX không hợp lệ. Thầy vui lòng copy đầy đủ từ \\documentclass đến \\end{document}.");
+            return;
+        }
+
+        const numExams = parseInt(document.getElementById('numExams').value);
+        let startCode = parseInt(document.getElementById('startCode').value);
+
+        const preambleMatch = sourceLatex.split('\\begin{document}');
+        const preamble = preambleMatch[0];
+        const docBody = preambleMatch[1].split('\\end{document}')[0];
+
+        let splitHeaderRegex = /% -+ (PHẦN I|ĐỀ THI TỰ LUẬN) -+|\\begin\{exI\}|\\begin\{exII\}|\\begin\{exIII\}|\\begin\{exTL\}/;
+        let headerMatch = docBody.split(splitHeaderRegex);
+        let examHeaderTemplate = headerMatch[0];
+
+        let regexI = /\\begin\{exI\}\{\d+\}\{([A-D])\}([\s\S]*?)\\end\{exI\}/g;
+        let regexII = /\\begin\{exII\}\{\d+\}\{([ĐS\s\-]+)\}([\s\S]*?)\\end\{exII\}/g;
+        let regexIII = /\\begin\{exIII\}\{\d+\}\{([^\}]+)\}([\s\S]*?)\\end\{exIII\}/g;
+        let regexTL = /\\begin\{exTL\}\{\d+\}\{([^\}]+)\}([\s\S]*?)\\end\{exTL\}/g; 
+
+        let part1 = []; let matchI;
+        while ((matchI = regexI.exec(docBody)) !== null) part1.push({ ans: matchI[1], body: matchI[2] });
+
+        let part2 = []; let matchII;
+        while ((matchII = regexII.exec(docBody)) !== null) part2.push({ ans: matchII[1], body: matchII[2] });
+
+        let part3 = []; let matchIII;
+        while ((matchIII = regexIII.exec(docBody)) !== null) part3.push({ ans: matchIII[1], body: matchIII[2] });
+
+        let part4 = []; let matchTL;
+        while ((matchTL = regexTL.exec(docBody)) !== null) part4.push({ diem: matchTL[1], body: matchTL[2] });
+
+        let isOnlyTL = (part1.length === 0 && part2.length === 0 && part3.length === 0 && part4.length > 0);
+
+        let transposedCsv = [];
+        let questionLabels = ["Câu \\ Mã đề"];
+        
+        for(let i=1; i<=part1.length; i++) questionLabels.push(`Câu ${i} (Phần I)`);
+        for(let i=1; i<=part2.length; i++) questionLabels.push(`Câu ${i} (Phần II)`);
+        for(let i=1; i<=part3.length; i++) questionLabels.push(`Câu ${i} (Phần III)`);
+
+        for (let i = 0; i < questionLabels.length; i++) {
+            transposedCsv.push([questionLabels[i]]);
+        }
+
+        let resetLists = `\n% --- RESET BỘ NHỚ LỜI GIẢI CHO MỖI MÃ ĐỀ ---\n\\renewcommand{\\listdaI}{} \\renewcommand{\\listdaII}{} \\renewcommand{\\listdaIII}{}\n\\renewcommand{\\listsolI}{} \\renewcommand{\\listsolII}{} \\renewcommand{\\listsolIII}{} \\renewcommand{\\listsolIV}{}\n`;
+        let fullShuffledLatex = preamble + "\\begin{document}\n";
+        let hasMulticols = sourceLatex.includes('\\begin{multicols}');
+
+        for (let e = 0; e < numExams; e++) {
+            let code = startCode + e;
+            if (transposedCsv.length > 0 && transposedCsv[0]) transposedCsv[0].push(code); 
+            let qIndex = 1; 
+            
+            let currentHeader = examHeaderTemplate.replace(/Mã đề: \d+/g, `Mã đề: ${code}`);
+            let redefFancy = `\\fancyfoot[L]{\\footnotesize \\textcolor{MainColor}{\\textbf{Mã đề ${code}}}}\n\\setcounter{page}{1}\n`;
+            
+            let examContent = resetLists + redefFancy + currentHeader;
+
+            if (part1.length > 0) {
+                examContent += `\n% ----------------- PHẦN I -----------------\n\\vspace{0.2cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn.}}\\newline\n\\textit{\\textcolor{gray}{Mỗi câu hỏi thí sinh chỉ chọn một phương án.}}\n\n`;
+                if (hasMulticols) examContent += "\\begin{multicols}{2}\n";
+                
+                let shuffled1 = shuffleArray(part1);
+                for (let i = 0; i < shuffled1.length; i++) {
+                    let processed = parseExI(shuffled1[i].body, shuffled1[i].ans); 
+                    examContent += `\\begin{exI}{${i+1}}{${processed.newAns}}${processed.newBody}\\end{exI}\n\n`;
+                    if(transposedCsv[qIndex]) transposedCsv[qIndex].push(processed.newAns);
+                    qIndex++;
+                }
+                if (hasMulticols) examContent += "\\end{multicols}\n";
+            }
+
+            if (part2.length > 0) {
+                examContent += `\n% ----------------- PHẦN II -----------------\n\\vspace{0.4cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN II. Câu trắc nghiệm đúng sai.}}\\newline\n\\textit{\\textcolor{gray}{Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.}}\n\n`;
+                if (hasMulticols) examContent += "\\begin{multicols}{2}\n";
+
+                let shuffled2 = shuffleArray(part2);
+                for (let i = 0; i < shuffled2.length; i++) {
+                    examContent += `\\begin{exII}{${i+1}}{${shuffled2[i].ans}}${shuffled2[i].body}\\end{exII}\n\n`;
+                    
+                    let cleanAns2 = shuffled2[i].ans.replace(/-/g, "");
+                    if(transposedCsv[qIndex]) transposedCsv[qIndex].push(cleanAns2);
+                    qIndex++;
+                }
+                if (hasMulticols) examContent += "\\end{multicols}\n";
+            }
+
+            if (part3.length > 0) {
+                examContent += `\n% ----------------- PHẦN III -----------------\n\\vspace{0.4cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN III. Câu trắc nghiệm trả lời ngắn.}}\\newline\n\\textit{\\textcolor{gray}{Viết câu trả lời vào ô tương ứng.}}\n\n`;
+                if (hasMulticols) examContent += "\\begin{multicols}{2}\n";
+
+                let shuffled3 = shuffleArray(part3);
+                for (let i = 0; i < shuffled3.length; i++) {
+                    let ansStr = shuffled3[i].ans.replace(/,/g, ".");
+                    examContent += `\\begin{exIII}{${i+1}}{${shuffled3[i].ans}}${shuffled3[i].body}\\end{exIII}\n\n`;
+                    
+                    if(transposedCsv[qIndex]) transposedCsv[qIndex].push(ansStr);
+                    qIndex++;
+                }
+                if (hasMulticols) examContent += "\\end{multicols}\n";
+            }
+
+            if (part4.length > 0) {
+                examContent += isOnlyTL ? `\n% ----------------- ĐỀ THI TỰ LUẬN -----------------\n\n` : `\n% ----------------- PHẦN TỰ LUẬN -----------------\n\\vspace{0.4cm}\n\\noindent\\textcolor{MainColor}{\\textbf{PHẦN TỰ LUẬN.}}\\newline\n\\textit{\\textcolor{gray}{Thí sinh trình bày chi tiết lời giải vào giấy kiểm tra.}}\n\n`;
+                for (let i = 0; i < part4.length; i++) {
+                    examContent += `\\begin{exTL}{${i+1}}{${part4[i].diem}}${part4[i].body}\\end{exTL}\n\n`;
+                }
+            }
+
+            // Gắn trang Hướng dẫn giải chi tiết cho TỪNG MÃ ĐỀ (nếu được tích)
+            let solSheet = "";
+            if (document.getElementById('includeSolution').checked) {
+                solSheet = `\n\\newpage \n\\begin{center} \\textcolor{MainColor}{\\textbf{\\Large HƯỚNG DẪN GIẢI CHI TIẾT - MÃ ĐỀ ${code}}} \\end{center}\n\\vspace{0.4cm}\n\\renewcommand{\\loigiai}[1]{%\n    \\newline \\textbf{\\textcolor{HighlightColor}{Lời giải & Thang điểm:}} #1%\n    \\vspace{0.1cm}\\newline\\rule{0.3\\textwidth}{0.4pt}%\n}\n`;
+                if (part1.length > 0) solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN I.}}\\newline \\listsolI \\vspace{0.5cm}\\newline\n`;
+                if (part2.length > 0) solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN II.}}\\newline \\listsolII \\vspace{0.5cm}\\newline\n`;
+                if (part3.length > 0) solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN III.}}\\newline \\listsolIII \\vspace{0.5cm}\\newline\n`;
+                if (part4.length > 0) {
+                    if (isOnlyTL) solSheet += `\\listsolIV\n`; 
+                    else solSheet += `\\noindent\\textcolor{MainColor}{\\textbf{PHẦN TỰ LUẬN.}}\\newline \\listsolIV\n`;
+                }
+            }
+
+            examContent += solSheet + `\\vspace{0.5cm}\n\\begin{center} \\textit{\\textcolor{gray}{--- Hết Mã đề ${code} ---}} \\end{center}\n\\newpage\n`;
+            fullShuffledLatex += examContent;
+        }
+
+        if (!isOnlyTL) {
+            fullShuffledLatex += `\n% ================= BẢNG ĐÁP ÁN TỔNG HỢP (IN RA GIẤY CHO GIÁO VIÊN) =================\n\\begin{center} \\textcolor{MainColor}{\\textbf{\\Large BẢNG TỔNG HỢP ĐÁP ÁN CÁC MÃ ĐỀ}} \\end{center}\n\\vspace{0.5cm}\n`;
+            
+            for(let e = 0; e < numExams; e++) {
+                let code = startCode + e;
+                let colIndex = e + 1;
+                
+                let p1Ans = [], p2Ans = [], p3Ans = [];
+                let rowIdx = 1;
+                
+                for(let i=0; i<part1.length; i++) { if(transposedCsv[rowIdx]) p1Ans.push(transposedCsv[rowIdx][colIndex]); rowIdx++; }
+                for(let i=0; i<part2.length; i++) { if(transposedCsv[rowIdx]) p2Ans.push(transposedCsv[rowIdx][colIndex]); rowIdx++; }
+                for(let i=0; i<part3.length; i++) { if(transposedCsv[rowIdx]) p3Ans.push(transposedCsv[rowIdx][colIndex]); rowIdx++; }
+
+                fullShuffledLatex += `\\noindent\\textcolor{MainColor}{\\textbf{Mã đề ${code}:}}\n\\begin{itemize}\n`;
+                if (part1.length > 0) fullShuffledLatex += `  \\item \\textbf{Phần I:} ` + p1Ans.join(', ') + `\n`;
+                if (part2.length > 0) fullShuffledLatex += `  \\item \\textbf{Phần II:} ` + p2Ans.join(' | ') + `\n`;
+                if (part3.length > 0) fullShuffledLatex += `  \\item \\textbf{Phần III:} ` + p3Ans.join(' ; ').replace(/"/g, '') + `\n`;
+                fullShuffledLatex += `\\end{itemize}\n\\vspace{0.3cm}\n`;
+            }
+        }
+
+        fullShuffledLatex += "\\end{document}";
+        
+        globalExcelData = transposedCsv;
+
+        document.getElementById('outputShuffledLatex').value = fullShuffledLatex;
+        document.getElementById('shuffledResultSection').style.display = 'block';
+        document.getElementById('shuffledResultSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function downloadExcel() {
+        if (!globalExcelData || globalExcelData.length <= 1) {
+            alert("Đề thi này 100% tự luận hoặc chưa có dữ liệu trắc nghiệm. Không cần tải Excel!");
+            return;
+        }
+        const worksheet = XLSX.utils.aoa_to_sheet(globalExcelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "DapAn");
+        XLSX.writeFile(workbook, "MaTran_DapAn_TronDe.xlsx");
+    }
+</script>
+
+</body>
+</html>
