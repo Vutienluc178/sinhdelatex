@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Sinh Thái LaTeX: Sinh Đề & Trộn Đề 2025</title>
+    <title> Sinh Đề & Trộn Đề latex Thầy Lực</title>
     <!-- Tích hợp thư viện SheetJS để xuất/nhập file Excel (.xlsx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -90,7 +90,7 @@
         <a href="https://www.overleaf.com/" target="_blank" class="nav-btn">✍️ 3. Biên dịch Overleaf</a>
     </div>
 
-    <p style="text-align: center; color: #7f8c8d; font-style: italic;">*Tích hợp tính năng Nạp Ma trận siêu tốc từ Excel & Google Sheets</p>
+    <p style="text-align: center; color: #7f8c8d; font-style: italic;">*Hỗ trợ tự động xuất PDF Trình chiếu, Kẻ mờ Worksheet & Căn lề thông minh.</p>
     
     <!-- PHẦN A: SINH PROMPT CHO AI -->
     <h2>1. THÔNG TIN TIÊU ĐỀ & ĐỊNH DẠNG</h2>
@@ -100,7 +100,7 @@
         <div class="form-group"><label>Môn - Lớp</label><input type="text" id="monlop" value="Môn: TOÁN - Lớp: 12"></div>
         <div class="form-group"><label>Thời gian làm bài (phút)</label><input type="number" id="thoigian" value="45"></div>
         <div class="form-group">
-            <label>Template Màu Sắc</label>
+            <label>Template Màu Sắc (Cho Bố cục 1, 2, 3)</label>
             <select id="colorTemplate">
                 <option value="1">1. Xanh Navy & Đỏ Crimson (Học thuật)</option>
                 <option value="2">2. Than chì & Xanh lá (Hiện đại)</option>
@@ -121,10 +121,13 @@
         <div class="form-group" style="grid-column: span 2;">
             <label>Bố cục đề thi (Layout Design)</label>
             <select id="layoutStyle" style="border: 2px solid var(--secondary); background-color: #f0fdf4;">
-                <option value="1">1. Chuẩn tinh tế (1 Cột, Truyền thống, Dễ nhìn nhất)</option>
-                <option value="2">2. Tiết kiệm không gian (Chia 2 cột dọc, Giống đề thi thật)</option>
-                <option value="3">3. Khung viền hiện đại (Tcolorbox cao cấp, Sang trọng, Đóng khung từng câu)</option>
-                <option value="4" style="font-weight: bold; color: #e74c3c;">4. Mobile A5 (Giấy A5, Font to 12pt, Màu nổi bật 3D, Dễ nhìn trên Điện thoại)</option>
+                <option value="1">1. Khổ A4: Chuẩn tinh tế (1 Cột, Truyền thống, Dễ nhìn nhất)</option>
+                <option value="2">2. Khổ A4: Tiết kiệm không gian (Chia 2 cột dọc, Giống đề thi thật)</option>
+                <option value="3">3. Khổ A4: Khung viền hiện đại (Tcolorbox cao cấp, Đóng khung từng câu)</option>
+                <option value="4" style="font-weight: bold; color: #e74c3c;">4. Khổ A5 (Mobile): Box Nổi Bật (Màu 3D, Dễ nhìn trên Điện thoại)</option>
+                <option value="5" style="font-weight: bold; color: #2980b9;">5. Khổ A5 (Mobile): Box Thanh Lịch (Viền trái, Toán màu Xanh Dương)</option>
+                <option value="6" style="font-weight: bold; color: #8e44ad;">6. Khổ A5 (Mobile): Box Tinh Giản (Viền trên, Toán màu Đỏ Tím)</option>
+                <option value="7" style="font-weight: bold; color: #16a085;">7. Màn Hình Chiếu 16:9 (1 Câu/Trang, Dòng kẻ mờ làm bài, Toán màu Xanh)</option>
             </select>
         </div>
     </div>
@@ -142,7 +145,6 @@
             <input type="text" id="gsheetLink" placeholder="Dán link Google Sheets vào đây..." style="flex-grow: 1; min-width: 200px; border-color: #3498db;">
             <button class="btn btn-copy" style="margin-top: 0; background-color: #3498db;" onclick="importFromGoogleSheet()">3. Nạp Từ Link</button>
         </div>
-        <p style="font-size: 12px; color: #7f8c8d; margin-top: 8px; margin-bottom: 0;">*Lưu ý: Nếu thầy dùng link Google Sheets, hãy đảm bảo Sheet đó đã được bật quyền <b>"Bất kỳ ai có liên kết đều xem được"</b> (Anyone with the link).</p>
     </div>
 
     <div class="preset-container">
@@ -243,6 +245,7 @@
 {{GEOMETRY_OPTS}}
 
 {{COLOR_PALETTE}}
+{{MATH_COLOR_CMD}}
 
 \newif\ifprintkey \newif\ifprintsol
 \printkeytrue \printsoltrue  
@@ -273,7 +276,6 @@
     // ==========================================
     // KHỐI TÍNH NĂNG IMPORT MA TRẬN
     // ==========================================
-
     function downloadTemplateExcel() {
         const templateData = [
             ["Chủ đề bài học (Ví dụ: Cực trị hàm số)", "Chi tiết dạng bài (Ví dụ: Tìm m để hàm số đạt cực trị tại x0)", "Mức độ (Nhận biết/Thông hiểu/Vận dụng/Vận dụng cao)", "Loại Câu (1=Trắc nghiệm, 2=Đúng Sai, 3=Ngắn, 4=Tự luận)", "Số Lượng", "Có Hình Vẽ (1=Có, 0=Không)"],
@@ -283,8 +285,7 @@
             ["Hình học không gian", "Tính thể tích khối chóp, khoảng cách", "Vận dụng cao", "4", "1", "1"]
         ];
         const ws = XLSX.utils.aoa_to_sheet(templateData);
-        ws['!cols'] = [{wch:25}, {wch:50}, {wch:15}, {wch:25}, {wch:10}, {wch:15}]; // Định dạng độ rộng cột
-        
+        ws['!cols'] = [{wch:25}, {wch:50}, {wch:15}, {wch:25}, {wch:10}, {wch:15}]; 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "MaTranTemplate");
         XLSX.writeFile(wb, "Template_MaTran_DeThi.xlsx");
@@ -304,7 +305,7 @@
             } catch (error) {
                 alert("Đã xảy ra lỗi khi đọc file. Vui lòng đảm bảo file đúng định dạng Excel mẫu.");
             }
-            document.getElementById('excelFileInput').value = ""; // Reset input
+            document.getElementById('excelFileInput').value = "";
         };
         reader.readAsArrayBuffer(file);
     }
@@ -328,9 +329,7 @@
         try {
             document.getElementById('gsheetLink').value = "Đang tải dữ liệu, thầy chờ chút nhé...";
             const response = await fetch(csvUrl);
-            if (!response.ok) {
-                throw new Error("Không thể tải dữ liệu. Thầy nhớ kiểm tra xem file Google Sheets đã mở quyền 'Bất kỳ ai có liên kết' (Anyone with the link) chưa nhé!");
-            }
+            if (!response.ok) throw new Error("Lỗi tải dữ liệu. Cần bật quyền 'Bất kỳ ai có liên kết'.");
             
             const arrayBuffer = await response.arrayBuffer();
             const data = new Uint8Array(arrayBuffer);
@@ -339,7 +338,6 @@
             processExcelWorkbook(workbook);
             document.getElementById('gsheetLink').value = "";
             alert("Nạp dữ liệu từ Google Sheets thành công rực rỡ!");
-            
         } catch (error) {
             document.getElementById('gsheetLink').value = link; 
             alert(error.message || "Đã xảy ra lỗi khi tải Google Sheets.");
@@ -382,9 +380,7 @@
 
             let coHinhRaw = (row[5] || "0").toString().toLowerCase().trim();
             let coHinh = false;
-            if (coHinhRaw === "1" || coHinhRaw === "có" || coHinhRaw === "true" || coHinhRaw === "yes") {
-                coHinh = true;
-            }
+            if (coHinhRaw === "1" || coHinhRaw === "có" || coHinhRaw === "true" || coHinhRaw === "yes") coHinh = true;
 
             addRowWithData(chude, chitiet, mucdo, loaicau, soluong, coHinh);
         }
@@ -488,14 +484,22 @@
 
 NHIỆM VỤ CỦA BẠN:
 1. BÁM SÁT CHI TIẾT MA TRẬN: Biên soạn chính xác số lượng, độ khó và ĐẶC BIỆT PHẢI TUÂN THỦ [YÊU CẦU DẠNG BÀI].
-2. KHÔNG THAY ĐỔI CẤU TRÚC LỆNH GỐC LaTeX. Dùng phẩy (,) cho số thập phân, chấm phẩy (;) cho tọa độ. BẮT BUỘC dùng ký hiệu vector dài \\overrightarrow{} cho tất cả các vector (VD: \\overrightarrow{AB}, \\overrightarrow{u}), TUYỆT ĐỐI KHÔNG dùng lệnh \\vec{}.`;
+2. QUY ƯỚC TOÁN HỌC VIỆT NAM (BẮT BUỘC): Dùng phẩy (,) cho số thập phân, chấm phẩy (;) cho tọa độ. BẮT BUỘC dùng ký hiệu vector dài \\overrightarrow{} cho tất cả các vector (VD: \\overrightarrow{AB}, \\overrightarrow{u}), TUYỆT ĐỐI KHÔNG dùng lệnh \\vec{}.`;
 
-        if (layoutOpt === "4") {
-            instructionForAI += `\n3. QUY TẮC CHÈN HÌNH TIKZ CHO KHỔ A5 MOBILE (VÔ CÙNG QUAN TRỌNG):
+        if (layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6" || layoutOpt === "7") {
+            if (layoutOpt === "7") {
+                instructionForAI += `\n3. QUY TẮC CHÈN HÌNH TIKZ CHO KHỔ 16:9 TRÌNH CHIẾU (VÔ CÙNG QUAN TRỌNG):
+   - ĐẶC BIỆT LƯU Ý: Đây là Bố cục màn hình chiếu 16:9. Mỗi câu hỏi sẽ được tự động in trên 1 trang slide riêng kèm dòng kẻ mờ.
+   - Với câu có hình vẽ TikZ, BẮT BUỘC đặt môi trường hình vẽ \\begin{center}...\\end{center} thành 1 khối riêng biệt (Nằm ngay bên dưới phần văn bản đề bài và phía trên phần đáp án).
+   - TUYỆT ĐỐI KHÔNG dùng wrapfigure hay makebox\\hangindent để chữ lượn quanh hình, vì không gian trên màn chiếu chữ to sẽ bị vỡ nát.
+   - BẮT BUỘC giảm thông số \\scale=... (VD: scale=0.45) để hình thật nhỏ gọn ở giữa trang, không bị lấn mất không gian dòng kẻ mờ bên dưới.`;
+            } else {
+                instructionForAI += `\n3. QUY TẮC CHÈN HÌNH TIKZ CHO KHỔ A5 MOBILE (VÔ CÙNG QUAN TRỌNG):
    - ĐẶC BIỆT LƯU Ý: Đây là Bố cục khổ giấy A5. Không gian bề ngang rất hẹp. 
-   - Hình vẽ TikZ BẮT BUỘC đặt ở môi trường \\begin{center}...\\end{center} thành 1 dòng riêng biệt (nằm giữa đề bài và đáp án). 
-   - TUYỆT ĐỐI KHÔNG dùng wrapfigure hay khối makebox.\\hangindent.
-   - Chỉnh sửa \\scale=... (VD: scale=0.45) để hình thật nhỏ gọn trên màn hình điện thoại.`;
+   - Với câu có hình vẽ TikZ, BẮT BUỘC đặt môi trường hình vẽ \\begin{center}...\\end{center} thành 1 khối riêng biệt (Nằm ngay bên dưới phần văn bản đề bài và phía trên phần đáp án).
+   - TUYỆT ĐỐI KHÔNG dùng wrapfigure hay makebox\\hangindent để chữ lượn quanh hình nữa, vì khổ A5 rất hẹp chữ sẽ bị vỡ nát.
+   - BẮT BUỘC giảm thông số \\scale=... (VD: scale=0.45) để hình thật nhỏ gọn vừa vặn trên màn hình điện thoại.`;
+            }
         } else {
             instructionForAI += `\n3. QUY TẮC CHÈN HÌNH TIKZ CHỐNG LỖI GIÃN CHỮ (VÔ CÙNG QUAN TRỌNG): 
    - Tuyệt đối KHÔNG DÙNG wrapfigure hay minipage. Tôi đã trang bị cho bạn thủ thuật \\hangafter và \\makebox. Kỹ thuật này giúp chữ tự động lượn vòng qua hình vẽ cực kỳ đẹp mắt mà KHÔNG BAO GIỜ bị giãn chữ.
@@ -507,10 +511,10 @@ NHIỆM VỤ CỦA BẠN:
    - Đề bài phải được viết nối tiếp NGAY DƯỚI dấu } cuối cùng của khối \\makebox.`;
         }
 
-        instructionForAI += `\n4. ĐÁP ÁN TRẮC NGHIỆM: Không dùng \\choice nếu có hình vẽ (tránh bị hình đè). BẮT BUỘC dùng \\choiceTwo hoặc \\choiceOne.`;
+        instructionForAI += `\n4. ĐÁP ÁN TRẮC NGHIỆM: Không dùng \\choice 4 cột nếu có hình vẽ. BẮT BUỘC dùng \\choiceTwo hoặc \\choiceOne.`;
    
-        if (layoutOpt === "4") {
-            instructionForAI += `\n   - HÃY ƯU TIÊN dùng \\choiceOne hoặc \\choiceTwo cho TẤT CẢ các câu trắc nghiệm vì giấy A5 rất hẹp.`;
+        if (layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6" || layoutOpt === "7") {
+            instructionForAI += `\n   - KHÔNG GIAN HẸP/MÀN CHIẾU NÊN BẠN HÃY ƯU TIÊN dùng \\choiceOne hoặc \\choiceTwo cho TẤT CẢ các câu trắc nghiệm.`;
         } else {
             instructionForAI += `\n   - MẸO: Nếu thấy đáp án bị hình đè, hãy chủ động chèn thêm lệnh \\vspace{...} vào cuối đề bài để đẩy đáp án xuống dưới vùng an toàn của hình.`;
         }
@@ -533,17 +537,32 @@ NHIỆM VỤ CỦA BẠN:
         if (colorOpt === '5') colorStr = "\\definecolor{MainColor}{HTML}{006064}\n\\definecolor{HighlightColor}{HTML}{F39C12}";
         if (colorOpt === '6') colorStr = "\\definecolor{MainColor}{HTML}{212121}\n\\definecolor{HighlightColor}{HTML}{E53935}";
 
+        let mathColorCmd = "";
+
         if (layoutOpt === "4") {
             docOpts = "12pt,a5paper";
-            // Tịnh tiến footer lên trên để dễ nhìn bằng cách tăng bottom margin và chỉnh footskip
-            geometryOpts = "\\usepackage[margin=1cm, top=1cm, bottom=2cm, footskip=0.8cm]{geometry}";
-            // Mặc định màu Xanh dương chủ đạo cho A5
-            colorStr = "\\definecolor{MainColor}{HTML}{0056b3}\n\\definecolor{HighlightColor}{HTML}{E63946}";
+            geometryOpts = "\\usepackage[margin=0.8cm, top=1cm, bottom=2cm, footskip=0.8cm]{geometry}";
+            colorStr = "\\definecolor{MainColor}{HTML}{0056b3}\n\\definecolor{HighlightColor}{HTML}{E63946}"; 
+        } else if (layoutOpt === "5") {
+            docOpts = "12pt,a5paper";
+            geometryOpts = "\\usepackage[margin=0.8cm, top=1cm, bottom=2cm, footskip=0.8cm]{geometry}";
+            colorStr = "\\definecolor{MainColor}{HTML}{004B87}\n\\definecolor{HighlightColor}{HTML}{F39C12}\n\\definecolor{MathColor}{HTML}{004B87}"; 
+            mathColorCmd = "\\everymath{\\color{MathColor}}\\everydisplay{\\color{MathColor}}";
+        } else if (layoutOpt === "6") {
+            docOpts = "12pt,a5paper";
+            geometryOpts = "\\usepackage[margin=0.8cm, top=1cm, bottom=2cm, footskip=0.8cm]{geometry}";
+            colorStr = "\\definecolor{MainColor}{HTML}{2C3E50}\n\\definecolor{HighlightColor}{HTML}{900C3F}\n\\definecolor{MathColor}{HTML}{900C3F}"; 
+            mathColorCmd = "\\everymath{\\color{MathColor}}\\everydisplay{\\color{MathColor}}";
+        } else if (layoutOpt === "7") {
+            docOpts = "12pt"; // Tự động set khổ 16:9 bằng geometry
+            geometryOpts = "\\usepackage[paperwidth=16cm, paperheight=9cm, margin=0.6cm, bottom=1cm, footskip=0.4cm]{geometry}";
+            colorStr = "\\definecolor{MainColor}{HTML}{0056b3}\n\\definecolor{HighlightColor}{HTML}{E63946}\n\\definecolor{MathColor}{HTML}{0056b3}"; // Xanh dương chủ đạo
+            mathColorCmd = "\\everymath{\\color{MathColor}}\\everydisplay{\\color{MathColor}}";
         }
 
         let layoutPackage = ""; let envDefs = "";
 
-        if (layoutOpt === "3" || layoutOpt === "4") { 
+        if (layoutOpt === "3" || layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6") { 
             layoutPackage = "\\usepackage[many]{tcolorbox}";
             let boxOpts = "";
             let boxOptsTL = "";
@@ -551,15 +570,33 @@ NHIỆM VỤ CỦA BẠN:
             if (layoutOpt === "3") {
                 boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
                 boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=5mm}, boxed title style={colback=MainColor, arc=1mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm]";
-            } else { // Option 4 Mobile A5
+            } else if (layoutOpt === "4") { 
                 boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=4mm}, boxed title style={colback=MainColor, arc=2mm, boxrule=0pt}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm, drop shadow]";
                 boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!3!white, coltitle=white, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=4mm}, boxed title style={colback=MainColor, arc=2mm, boxrule=0pt}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm, drop shadow]";
+            } else if (layoutOpt === "5") {
+                boxOpts = "[enhanced, breakable, colframe=MainColor, colback=MainColor!2!white, coltitle=MainColor, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1}, attach boxed title to top left={yshift=-2mm, xshift=4mm}, boxed title style={colback=MainColor!10!white, colframe=white, arc=2mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm, borderline west={1.5mm}{0pt}{MainColor}]";
+                boxOptsTL = "[enhanced, breakable, colframe=MainColor, colback=MainColor!2!white, coltitle=MainColor, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1 (#2)}, attach boxed title to top left={yshift=-2mm, xshift=4mm}, boxed title style={colback=MainColor!10!white, colframe=white, arc=2mm}, top=4mm, bottom=2mm, left=2mm, right=2mm, arc=2mm, borderline west={1.5mm}{0pt}{MainColor}]";
+            } else if (layoutOpt === "6") {
+                boxOpts = "[enhanced, breakable, frame hidden, colback=white, coltitle=HighlightColor, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1.}, attach title to upper, after title={\\space}, top=2mm, bottom=2mm, left=2mm, right=2mm, borderline north={1.5pt}{0pt}{HighlightColor}]";
+                boxOptsTL = "[enhanced, breakable, frame hidden, colback=white, coltitle=HighlightColor, fonttitle=\\bfseries\\large, title=\\textbf{Câu #1 (#2).}, attach title to upper, after title={\\space}, top=2mm, bottom=2mm, left=2mm, right=2mm, borderline north={1.5pt}{0pt}{HighlightColor}]";
             }
             
             envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOpts} \\BODY \\end{tcolorbox} \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.3cm} \\begin{tcolorbox}${boxOptsTL} \\BODY \\end{tcolorbox} \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}`;
+        } else if (layoutOpt === "7") {
+            // Môi trường 16:9 với Đường Kẻ Mờ Tự Động (Worksheet)
+            envDefs = `\\newcommand{\\filllines}{%
+    \\par\\vspace{0.3cm}%
+    \\begingroup\\color{gray!40}%
+    \\leaders\\vbox to 0.8cm{\\vfill\\hrule}\\vfill\\null%
+    \\endgroup\\newpage
+}
+\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}
+\\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}
+\\NewEnviron{exIII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaIII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolIII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}
+\\NewEnviron{exTL}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.1cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1 (#2).}} \\ignorespaces \\BODY \\par \\endgroup \\xappto\\listsolIV{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1 (#2).}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par} \\filllines}`;
         } else {
             envDefs = `\\NewEnviron{exI}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaI{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\hspace{0.6cm}} \\xappto\\listsolI{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
 \\NewEnviron{exII}[2]{\\begingroup \\renewcommand{\\loigiai}[1]{} \\vspace{0.15cm} \\par\\noindent\\textcolor{MainColor}{\\textbf{Câu #1.}} \\ignorespaces \\BODY \\par \\endgroup \\gappto\\listdaII{\\textbf{#1}. \\textcolor{HighlightColor}{#2} \\newline} \\xappto\\listsolII{\\noexpand\\vspace{0.3cm}\\noexpand\\noindent\\noexpand\\textcolor{MainColor}{\\noexpand\\textbf{Câu #1.}} \\expandafter\\unexpanded\\expandafter{\\BODY}\\noexpand\\par}}
@@ -571,6 +608,7 @@ NHIỆM VỤ CỦA BẠN:
             .replace('{{DOC_OPTS}}', docOpts)
             .replace('{{GEOMETRY_OPTS}}', geometryOpts)
             .replace('{{FONT_PACKAGE}}', fontStr).replace('{{COLOR_PALETTE}}', colorStr)
+            .replace('{{MATH_COLOR_CMD}}', mathColorCmd)
             .replace('{{LAYOUT_PACKAGE}}', layoutPackage).replace('{{ENV_DEFINITIONS}}', envDefs);
         
         let latexTitle = `\n% ================= BẮT ĐẦU TRANG ĐỀ THI =================\n\\noindent\n\\begin{minipage}[t]{0.45\\textwidth}\n    \\centering\n    \\footnotesize SỞ GD\\&ĐT TP HỒ CHÍ MINH\\newline\n    \\textcolor{MainColor}{\\textbf{${truong}}}\n\\end{minipage}\n\\hfill\n\\begin{minipage}[t]{0.45\\textwidth}\n    \\centering\n    \\footnotesize \\textcolor{HighlightColor}{\\textbf{${kythi}}}\\newline\n    \\textbf{${monlop}} | \\textit{Thời gian: ${thoigian} phút}\n\\end{minipage}\n\n\\vspace{0.2cm}\\noindent \n{\\footnotesize \\textbf{Họ tên thí sinh:} \\dotfill \\textbf{SBD:} \\dotfill \\textbf{Mã đề: 101}}\n\\vspace{0.1cm}\\newline\n\\textcolor{MainColor}{\\rule{\\textwidth}{1.5pt}}\n`;
@@ -592,7 +630,7 @@ NHIỆM VỤ CỦA BẠN:
             for (let i = 0; i < soluong; i++) {
                 if (loaicau === "1") {
                     if(coHinh) {
-                        if (layoutOpt === "4") {
+                        if (layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6" || layoutOpt === "7") {
                             p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exI}{${q1}}{A}\nNhập đề bài vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY (Căn giữa, tự động không đè lề)\n    \\end{tikzpicture}\n\\end{center}\n\\choiceTwo % Dùng \\choiceTwo hoặc \\choiceOne\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
                         } else {
                             p1Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exI}{${q1}}{A}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài vào đây (Văn bản sẽ tự động ôm mượt mà sang mép trái hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các phương án trắc nghiệm bị đè lên hình vẽ\n\\choiceTwo % Dùng \\choiceTwo hoặc \\choiceOne\n{Nhập đáp án A}\n{Nhập đáp án B}\n{Nhập đáp án C}\n{Nhập đáp án D}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exI}\n\n`;
@@ -603,7 +641,7 @@ NHIỆM VỤ CỦA BẠN:
                     q1++;
                 } else if (loaicau === "2") {
                     if(coHinh) {
-                        if (layoutOpt === "4") {
+                        if (layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6" || layoutOpt === "7") {
                             p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n    \\end{tikzpicture}\n\\end{center}\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
                         } else {
                             p2Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exII}{${q2}}{Đ-S-Đ-S}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đoạn văn bản dẫn chung (giả thiết) vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu các mệnh đề a,b,c,d bên dưới bị đè lên hình vẽ\n\\choiceTF\n{Nhập mệnh đề a}\n{Nhập mệnh đề b}\n{Nhập mệnh đề c}\n{Nhập mệnh đề d}\n\\loigiai{\n    a) Đúng/Sai. Lời giải thích... \\newline\n    b) Đúng/Sai. Lời giải thích... \\newline\n    c) Đúng/Sai. Lời giải thích... \\newline\n    d) Đúng/Sai. Lời giải thích...\n}\n\\end{exII}\n\n`;
@@ -614,7 +652,7 @@ NHIỆM VỤ CỦA BẠN:
                     q2++;
                 } else if (loaicau === "3") {
                     if(coHinh) {
-                        if (layoutOpt === "4") {
+                        if (layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6" || layoutOpt === "7") {
                             p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\nNhập đề bài câu trả lời ngắn vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n    \\end{tikzpicture}\n\\end{center}\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
                         } else {
                             p3Content += `% AI: ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exIII}{${q3}}{Đáp_Số_Ở_Đây}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài câu trả lời ngắn vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập lời giải chi tiết vào đây...\n}\n\\end{exIII}\n\n`;
@@ -625,7 +663,7 @@ NHIỆM VỤ CỦA BẠN:
                     q3++;
                 } else if (loaicau === "4") {
                     if(coHinh) {
-                        if (layoutOpt === "4") {
+                        if (layoutOpt === "4" || layoutOpt === "5" || layoutOpt === "6" || layoutOpt === "7") {
                             p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exTL}{${q4}}{[Điền số điểm]}\nNhập đề bài tự luận vào đây...\n\\begin{center}\n    \\begin{tikzpicture}[scale=0.45, >=stealth, line join=round, line cap=round]\n        % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n    \\end{tikzpicture}\n\\end{center}\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
                         } else {
                             p4Content += `% AI (TỰ LUẬN): ${chude} | ${chitiet} | ${mucdo} [CÓ HÌNH VẼ TIKZ]\n\\begin{exTL}{${q4}}{[Điền số điểm]}\n\\hangafter=-6 \\hangindent=-0.4\\linewidth % Chữ chiếm 3/5, hình 2/5\n\\makebox[0pt][l]{%\n    \\hspace{0.6\\linewidth}% Đẩy hình sang phải 3/5\n    \\raisebox{-3.5cm}[0pt][0pt]{% AI tự chỉnh độ cao hạ hình xuống\n        \\begin{tikzpicture}[scale=0.6, >=stealth, line join=round, line cap=round]\n            % AI HÃY VIẾT MÃ TIKZ VẼ HÌNH MINH HỌA VÀO ĐÂY\n        \\end{tikzpicture}%\n    }%\n}%\nNhập đề bài tự luận vào đây (Văn bản tự ôm mượt mà quanh hình)...\n\n\\vspace{0.5cm} % AI chủ động tăng/giảm vspace này nếu hình vẽ đè xuống câu tiếp theo\n\\loigiai{\n    Nhập hướng dẫn chấm và thang điểm vào đây. Dùng lệnh \\diem{0.25} ở cuối mỗi bước.\\newline\n    Ví dụ: Ta có phương trình... \\diem{0.25} \\newline\n}\n\\end{exTL}\n\n`;
@@ -793,7 +831,10 @@ NHIỆM VỤ CỦA BẠN:
 
         let resetLists = `\n% --- RESET BỘ NHỚ LỜI GIẢI CHO MỖI MÃ ĐỀ ---\n\\renewcommand{\\listdaI}{} \\renewcommand{\\listdaII}{} \\renewcommand{\\listdaIII}{}\n\\renewcommand{\\listsolI}{} \\renewcommand{\\listsolII}{} \\renewcommand{\\listsolIII}{} \\renewcommand{\\listsolIV}{}\n`;
         let fullShuffledLatex = preamble + "\\begin{document}\n";
-        let hasMulticols = sourceLatex.includes('\\begin{multicols}');
+        
+        // Hủy bỏ chia 2 cột nếu là chế độ Màn hình chiếu 16:9
+        let isSlide = preamble.includes("16cm") && preamble.includes("9cm");
+        let hasMulticols = sourceLatex.includes('\\begin{multicols}') && !isSlide;
 
         for (let e = 0; e < numExams; e++) {
             let code = startCode + e;
@@ -856,7 +897,7 @@ NHIỆM VỤ CỦA BẠN:
                 }
             }
 
-            // Gắn trang Hướng dẫn giải chi tiết cho TỪNG MÃ ĐỀ (nếu được tích)
+            // Lời giải chi tiết
             let solSheet = "";
             if (document.getElementById('includeSolution').checked) {
                 solSheet = `\n\\newpage \n\\begin{center} \\textcolor{MainColor}{\\textbf{\\Large HƯỚNG DẪN GIẢI CHI TIẾT - MÃ ĐỀ ${code}}} \\end{center}\n\\vspace{0.4cm}\n\\renewcommand{\\loigiai}[1]{%\n    \\newline \\textbf{\\textcolor{HighlightColor}{Lời giải & Thang điểm:}} #1%\n    \\vspace{0.1cm}\\newline\\rule{0.3\\textwidth}{0.4pt}%\n}\n`;
